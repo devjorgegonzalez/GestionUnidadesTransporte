@@ -43,7 +43,7 @@ flowchart TD
    - Implementar en `apps/web` la pantalla `/login`, almacenamiento de sesión JWT, layout administrativo con navegación lateral y protección de rutas.
 
 ### Entregable y Verificación de Fase 1:
-- Levantar `docker compose up --build`, verificar Swagger en `http://localhost:4000/api/docs` e iniciar sesión en `http://localhost:3000/login`.
+- Levantar `docker compose up --build`, verificar Swagger en `http://localhost:10102/api/docs` e iniciar sesión en `http://localhost:10101/login` (contenedores expuestos en el rango de puertos `10101 - 10109`).
 
 ---
 
@@ -123,7 +123,7 @@ flowchart TD
 3. **Servicio en Segundo Plano y Sincronización Offline-First (`TrackingForegroundService` + Room):**
    - Configurar permisos de ubicación en primer y segundo plano (`FOREGROUND_SERVICE_LOCATION`).
    - Capturar coordenadas (`lat`, `lng`) y velocidad (`km/h`) cada 10s / 15m guardándolas en Room (`puntos_tracking_locales`).
-   - Implementar sincronizador en lotes cada **5 minutos** hacia `/api/v1/viajes/:id/tracking/batch` con reintento automático al recuperar conexión a internet (`NetworkCallback`).
+   - Implementar sincronizador en lotes cada **5 minutos** hacia `/api/v1/viajes/:id/tracking/batch` con almacenamiento persistente en Room; si no encuentra conexión con la API, espera a restablecer comunicación para enviar los lotes acumulados.
 4. **Pantalla de Viaje Activo (`ViajeActivoScreen` + `ViajeActivoViewModel`):**
    - Componente de **Velocímetro en tiempo real (`km/h`)** en Jetpack Compose.
    - Componente `GoogleMap` mostrando posición actual de la UT, marcadores de Origen/Destino, ruta sugerida y polilínea de la ruta recorrida en tiempo real.

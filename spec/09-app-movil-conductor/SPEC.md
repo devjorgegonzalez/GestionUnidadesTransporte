@@ -34,7 +34,7 @@ Desarrollar la aplicación móvil nativa para **Android 14+ (API 34+)** enfocada
 ### 3.2 Pantalla 2: Viaje en Curso — Velocímetro y Mapa (`ViajeActivoScreen`)
 Al pulsar **"Iniciar Viaje"**, la app invoca `POST /api/v1/viajes/:id/iniciar`, arranca el `TrackingForegroundService` y navega a la pantalla de viaje activo, compuesta por:
 1. **Cabecera y Velocímetro en Tiempo Real:**
-   - Indicador visual tipo **Velocímetro Digital / Gauge en Compose** que muestra la velocidad actual del vehículo en **`km/h`** (calculada desde `location.speed * 3.6f`), distancia acumulada en el viaje (`km`) y estado de sincronización con el servidor (*"Sincronizado"* / *"X puntos pendientes — Sin conexión, guardando en dispositivo"*).
+   - Indicador visual tipo **Velocímetro Digital / Gauge en Compose** que muestra la velocidad actual del vehículo en **`km/h`** (calculada desde `location.speed * 3.6f`), distancia acumulada en el viaje (`km`) y estado de conectividad/sincronización con el API (*"Sincronizado con API"* / *"Sin conexión con el API — X registros guardados en dispositivo, esperando conexión..."*).
 2. **Mapa Interactivo Google Maps (`GoogleMap` Compose):**
    - Muestra en tiempo real la ubicación actual de la UT (marcador del vehículo con orientación).
    - Muestra los marcadores de **Origen** y **Destino** y la polilínea sugerida por Google Maps (color tenue/punteado).
@@ -60,22 +60,23 @@ Al pulsar **"Iniciar Viaje"**, la app invoca `POST /api/v1/viajes/:id/iniciar`, 
 1. **Captura Continua en Segundo Plano:**
    - Solicita actualizaciones a `FusedLocationProviderClient` con `Priority.PRIORITY_HIGH_ACCURACY`, intervalo de **10 segundos** (`10_000 ms`) y desplazamiento mínimo de **15 metros**.
    - Aunque el conductor minimice la app, abra otra aplicación (ej. Waze, WhatsApp, llamadas) o bloquee la pantalla, el `ForegroundService` mantiene una notificación persistente (*"Viaje en curso - Registrando recorrido de UT [PLACA]"*) y continúa guardando cada punto en Room.
-2. **Sincronización al Backend cada 5 Minutos (Offline-First):**
-   - Un bucle periódico dentro del alcance de corrutinas del servicio (cada **5 minutos = 300,000 ms**) más un observador de conectividad (`ConnectivityManager.NetworkCallback`):
+2. **Sincronización al Backend cada 5 Minutos y Espera por Conexión con el API (Offline-First):**
+   - Un bucle periódico dentro del alcance de corrutinas del servicio (cada **5 minutos = 300,000 ms**) más un observador de conectividad de red (`ConnectivityManager.NetworkCallback`):
      - Consulta en Room todos los registros del `viajeId` con `sincronizado = false` ordenados por `capturadoEn ASC`.
-     - Si existen puntos pendientes y hay conexión a internet, los envía en lote a `POST /api/v1/viajes/:viajeId/tracking/batch`.
-     - Al recibir respuesta exitosa del backend, marca esos registros como `sincronizado = true` en Room.
-     - **En caso de perder conexión a internet:** los puntos siguen almacenándose en Room sin pérdida de datos; apenas el `NetworkCallback` detecta el retorno de conectividad (o en el siguiente ciclo de 5 minutos), sube automáticamente todos los lotes acumulados.
+     - Intenta el envío en lote a `POST /api/v1/viajes/:viajeId/tracking/batch`.
+     - **Regla de Espera de Conexión con el API:** Si la app **no encuentra conexión con la API** (sin internet, timeout, red inestable o API no disponible), **no se descarta ningún dato**; la app mantiene los registros guardados localmente en Room y **esperará hasta tener conexión efectiva con la API** para reintentar el envío. Apenas se reanuda la conectividad con el API, se envían automáticamente todos los lotes acumulados en orden cronológico.
+     - Al recibir confirmación exitosa del backend (`HTTP 200/201`), marca dichos registros como `sincronizado = true` en Room.
 3. **Finalización del Viaje:**
    - Al presionar **"Terminar Viaje"**:
      1. Detiene la captura de nuevos puntos GPS.
-     2. Toma todos los puntos pendientes (`sincronizado = false`) en Room y los envía junto con la petición de cierre a `POST /api/v1/viajes/:viajeId/finalizar`.
-     3. Si en el instante exacto de terminar el viaje no hubiera conexión a internet, encola la petición de cierre mediante `WorkManager` con restricción `NetworkType.CONNECTED` para que se ejecute automáticamente en cuanto recupere señal, informando claramente al conductor en pantalla.
-     4. Detiene el `TrackingForegroundService` y regresa a la pantalla de reservas mostrando el resumen de kilómetros recorridos.
+     2. Toma todos los puntos pendientes (`sincronizado = false`) en Room e intenta enviarlos junto con la petición de cierre a `POST /api/v1/viajes/:viajeId/finalizar`.
+     3. Si en el momento de terminar el viaje la app no encuentra conexión con la API, encola la tarea mediante `WorkManager` con política de reintentos continuos para que, en cuanto la app recupere conexión con la API, se envíen todos los registros pendientes y se finalice formalmente el viaje en el servidor, manteniendo al conductor informado en pantalla (*"Viaje finalizado localmente. Esperando conexión con el API para sincronizar registros..."*).
+     4. Detiene el `TrackingForegroundService` y regresa a la pantalla de reservas.
 
 ## 5. Criterios de Aceptación
 - [ ] El conductor ingresa solo con su cédula y la placa de la UT, visualizando las reservas del día actual sin restricción por hora de inicio.
 - [ ] Durante el viaje se muestra en pantalla el velocímetro en `km/h`, la ubicación actual en Google Maps y el trazo de la ruta realizada.
 - [ ] La app continúa registrando coordenadas y velocidad en segundo plano cuando el conductor cambia a otra aplicación.
-- [ ] Los puntos se guardan localmente en Room y se suben al backend cada 5 minutos; si se corta internet, se acumulan localmente y se sincronizan al recuperar conexión.
-- [ ] Al pulsar "Terminar Viaje", se envían los puntos restantes, se cierra el viaje y la UT actualiza su kilometraje y vuelve a estado `DISPONIBLE`.
+- [ ] Los puntos se guardan localmente en Room y se suben al backend cada 5 minutos.
+- [ ] Si la app no encuentra conexión con la API, espera a tener conexión disponible con la API para enviar los registros, garantizando cero pérdida de datos.
+- [ ] Al pulsar "Terminar Viaje", se envían los puntos restantes (o se programan para envío en cuanto haya conexión con la API), se cierra el viaje y la UT actualiza su kilometraje y vuelve a estado `DISPONIBLE`.

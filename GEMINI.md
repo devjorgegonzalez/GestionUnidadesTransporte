@@ -72,13 +72,14 @@ GestionUnidadesTransporte/
 - **Tracking en Segundo Plano y Offline-First:**
   - `ForegroundService` con tipo `location` (`FOREGROUND_SERVICE_LOCATION`) y notificación persistente para que Android 14+ mantenga la captura activa aunque el conductor cambie de aplicación o bloquee la pantalla.
   - Captura GPS local mediante `FusedLocationProviderClient` cada **10 segundos** (o desplazamiento mínimo de 15 metros), almacenando coordenadas (`lat`, `lng`), velocidad (`km/h`) y `timestamp` en base de datos local **Room (SQLite)** con flag `sincronizado = false`.
-  - Sincronización en lote (**batch upload**) hacia el backend cada **5 minutos** mediante un `CoroutineWorker` / temporizador del servicio, y vaciado inmediato (`flush`) al presionar **"Terminar viaje"**. Si no hay internet, los puntos permanecen en Room y se envían automáticamente al recuperar conectividad.
+  - Sincronización en lote (**batch upload**) hacia el backend cada **5 minutos** mediante un `CoroutineWorker` / temporizador del servicio, y vaciado inmediato (`flush`) al presionar **"Terminar viaje"**. Si la app no encuentra conexión con la API (sin internet o API no disponible), los puntos permanecen almacenados localmente en Room y la app esperará a tener conexión efectiva con la API para enviar todos los registros acumulados sin pérdida de datos.
 
 ### 5.5 Ambiente de Prueba (`Docker`)
-- Orquestado mediante `docker-compose.yml` en la raíz del proyecto, levantando:
-  1. `mongodb`: Contenedor MongoDB 7 local para emular CosmosDB MongoDB API en entorno de pruebas.
-  2. `backend`: API NestJS conectada a `mongodb`.
-  3. `web`: Aplicación Next.js conectada al `backend`.
+- Orquestado mediante `docker-compose.yml` en la raíz del proyecto. **Regla de puertos:** Todos los contenedores deben quedar expuestos hacia el host dentro del rango **`10101 - 10109`**:
+  1. `web` (Next.js): Puerto expuesto `10101` (`10101:3000` o `http://localhost:10101`).
+  2. `backend` (NestJS API REST + Swagger): Puerto expuesto `10102` (`10102:4000` o `http://localhost:10102`), con Swagger expuesto en `http://localhost:10102/api/docs`.
+  3. `mongodb` (Mongo 7 emulando CosmosDB MongoDB API): Puerto expuesto `10103` (`10103:27017` o `mongodb://localhost:10103/gestion_ut`).
+  4. Puertos `10104 - 10109` reservados para servicios o herramientas auxiliares en caso de requerirse.
 
 ## 6. Invariantes y Reglas de Negocio Globales
 1. **Estados de la UT:** `DISPONIBLE`, `VIAJANDO`, `EN_MANTENIMIENTO`, `INACTIVA`.
