@@ -48,8 +48,16 @@ class ViajeActivoViewModel @Inject constructor(
 
     private val viajeId: String = savedStateHandle["viajeId"] ?: ""
     private val placa: String = savedStateHandle["placa"] ?: "UT"
-    private val origenNombre: String = savedStateHandle["origenNombre"] ?: "Origen"
-    private val destinoNombre: String = savedStateHandle["destinoNombre"] ?: "Destino"
+    private val origenNombre: String = try {
+        java.net.URLDecoder.decode(savedStateHandle["origenNombre"] ?: "Origen", java.nio.charset.StandardCharsets.UTF_8.toString())
+    } catch (e: Exception) {
+        savedStateHandle["origenNombre"] ?: "Origen"
+    }
+    private val destinoNombre: String = try {
+        java.net.URLDecoder.decode(savedStateHandle["destinoNombre"] ?: "Destino", java.nio.charset.StandardCharsets.UTF_8.toString())
+    } catch (e: Exception) {
+        savedStateHandle["destinoNombre"] ?: "Destino"
+    }
     private val origenLat: Double = savedStateHandle.get<Float>("origenLat")?.toDouble() ?: 10.4806
     private val origenLng: Double = savedStateHandle.get<Float>("origenLng")?.toDouble() ?: -66.8617
     private val destinoLat: Double = savedStateHandle.get<Float>("destinoLat")?.toDouble() ?: 10.5050

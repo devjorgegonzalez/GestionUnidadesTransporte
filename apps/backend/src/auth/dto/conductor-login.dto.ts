@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class ConductorLoginDto {
@@ -15,13 +15,20 @@ export class ConductorLoginDto {
   cedula: string;
 
   @ApiProperty({
-    example: 'ABC-123',
-    description: 'Placa de la Unidad de Transporte asignada',
+    example: 'ABC1001',
+    description:
+      'Placa de la Unidad de Transporte asignada (exactamente 7 caracteres alfanuméricos en mayúsculas)',
   })
   @IsString({ message: 'La placa debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'La placa es requerida' })
+  @Matches(/^[A-Z0-9]{7}$/, {
+    message:
+      'La placa debe tener exactamente 7 caracteres alfanuméricos en mayúsculas (sin espacios ni guiones, ej. ABC1001)',
+  })
   @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.toUpperCase().trim() : value,
+    typeof value === 'string'
+      ? value.toUpperCase().trim().replace(/[\s-]/g, '')
+      : value,
   )
   placa: string;
 }

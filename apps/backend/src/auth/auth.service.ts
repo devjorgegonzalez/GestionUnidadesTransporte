@@ -79,7 +79,7 @@ export class AuthService {
 
   async loginConductor(dto: ConductorLoginDto) {
     const cleanCedula = dto.cedula.trim();
-    const cleanPlaca = dto.placa.toUpperCase().trim();
+    const cleanPlaca = dto.placa.toUpperCase().trim().replace(/[\s-]/g, '');
 
     const conductor = await this.conductorModel.findOne({
       cedula: cleanCedula,

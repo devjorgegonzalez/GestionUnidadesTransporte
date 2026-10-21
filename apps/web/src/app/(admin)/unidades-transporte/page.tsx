@@ -64,7 +64,14 @@ export interface UnidadTransporte {
 }
 
 const utSchema = z.object({
-  placa: z.string().min(2, "La placa es requerida").toUpperCase(),
+  placa: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(
+      /^[A-Z0-9]{7}$/,
+      "La placa debe tener exactamente 7 caracteres alfanuméricos en mayúsculas, sin espacios ni guiones (ej. ABC1001)",
+    ),
   marca: z.string().min(2, "La marca es requerida"),
   modelo: z.string().min(1, "El modelo es requerido"),
   anio: z.coerce
@@ -123,11 +130,9 @@ export default function UnidadesTransportePage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await apiFetch<{
-        data: UnidadTransporte[];
-        meta: { total: number };
-      }>("/unidades-transporte?limit=100");
-      setData(res.data || []);
+      const res = await apiFetch<any>("/unidades-transporte?limit=100");
+      const items = Array.isArray(res) ? res : (res?.data || []);
+      setData(items);
     } catch (err: unknown) {
       console.error("Error al cargar unidades de transporte", err);
     } finally {
@@ -471,12 +476,22 @@ export default function UnidadesTransportePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="placa">Placa</Label>
+                <Label htmlFor="placa">Placa (7 caracteres)</Label>
                 <Input
                   id="placa"
-                  placeholder="ej. ABC-123"
-                  className="font-mono uppercase"
-                  {...register("placa")}
+                  placeholder="ej. ABC1001"
+                  maxLength={7}
+                  className="font-mono uppercase tracking-wider"
+                  {...register("placa", {
+                    onChange: (e) => {
+                      if (e.target) {
+                        e.target.value = e.target.value
+                          .toUpperCase()
+                          .replace(/[^A-Z0-9]/g, "")
+                          .slice(0, 7);
+                      }
+                    },
+                  })}
                   disabled={submitting}
                 />
                 {errors.placa && (

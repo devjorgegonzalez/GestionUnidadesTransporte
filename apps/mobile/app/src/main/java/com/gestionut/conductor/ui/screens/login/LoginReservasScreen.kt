@@ -20,23 +20,30 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Dns
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +53,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gestionut.conductor.BuildConfig
 import com.gestionut.conductor.data.remote.dto.ReservaDto
 
 @Composable
@@ -56,6 +64,54 @@ fun LoginReservasScreen(
     val state by viewModel.uiState.collectAsState()
     val session by viewModel.session.collectAsState()
     val context = LocalContext.current
+    var showServerDialog by remember { mutableStateOf(false) }
+    var serverUrlInput by remember(session.customBaseUrl) {
+        mutableStateOf(session.customBaseUrl ?: BuildConfig.BASE_URL)
+    }
+
+    if (showServerDialog) {
+        AlertDialog(
+            onDismissRequest = { showServerDialog = false },
+            title = { Text("Configurar Servidor API", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = "Ingresa la URL del backend accesible desde tu dispositivo móvil en la red local:",
+                        fontSize = 13.sp
+                    )
+                    OutlinedTextField(
+                        value = serverUrlInput,
+                        onValueChange = { serverUrlInput = it },
+                        label = { Text("URL Base") },
+                        placeholder = { Text("http://192.168.0.160:10102/api/v1/") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.updateServerUrl(serverUrlInput)
+                        showServerDialog = false
+                    }
+                ) {
+                    Text("Guardar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.updateServerUrl(null)
+                        serverUrlInput = BuildConfig.BASE_URL
+                        showServerDialog = false
+                    }
+                ) {
+                    Text("Restablecer")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -63,29 +119,40 @@ fun LoginReservasScreen(
                 color = MaterialTheme.colorScheme.primary,
                 tonalElevation = 4.dp
             ) {
-                Column(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Gestión UT",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                    Text(
-                        text = "App del Conductor",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White
-                    )
-                    if (!session.conductorNombre.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(4.dp))
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Conductor: ${session.conductorNombre} | UT: ${session.utPlaca}",
-                            fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.9f)
+                            text = "Gestión UT",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                        Text(
+                            text = "App del Conductor",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                        if (!session.conductorNombre.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Conductor: ${session.conductorNombre} | UT: ${session.utPlaca}",
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.9f)
+                            )
+                        }
+                    }
+                    IconButton(onClick = { showServerDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Dns,
+                            contentDescription = "Configurar Servidor",
+                            tint = Color.White
                         )
                     }
                 }
@@ -145,8 +212,9 @@ fun LoginReservasScreen(
                         OutlinedTextField(
                             value = state.placa,
                             onValueChange = viewModel::onPlacaChange,
-                            label = { Text("Placa de la UT") },
-                            placeholder = { Text("Ej. ABC-101") },
+                            label = { Text("Placa de la UT (7 caracteres)") },
+                            placeholder = { Text("Ej. ABC1001") },
+                            supportingText = { Text("7 caracteres alfanuméricos en mayúsculas sin guiones ni espacios") },
                             leadingIcon = {
                                 Icon(Icons.Default.DirectionsCar, contentDescription = null)
                             },
@@ -188,6 +256,15 @@ fun LoginReservasScreen(
                                 Text("Buscar Reservas de Hoy", fontWeight = FontWeight.Bold)
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                        val currentServerUrl = session.customBaseUrl ?: BuildConfig.BASE_URL
+                        Text(
+                            text = "Servidor: $currentServerUrl",
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 }
             }
@@ -277,7 +354,7 @@ fun ReservaItemCard(
                     text = "${reserva.kilometrajeSugerido} km sugeridos",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (isEnCurso) Color(0xFF334155) else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -295,7 +372,8 @@ fun ReservaItemCard(
                 Text(
                     text = "Origen: ${reserva.origen.nombre ?: reserva.origen.direccion ?: "Punto de salida"}",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isEnCurso) Color(0xFF0F172A) else MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -312,7 +390,8 @@ fun ReservaItemCard(
                 Text(
                     text = "Destino: ${reserva.destino.nombre ?: reserva.destino.direccion ?: "Punto de llegada"}",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isEnCurso) Color(0xFF0F172A) else MaterialTheme.colorScheme.onSurface
                 )
             }
 

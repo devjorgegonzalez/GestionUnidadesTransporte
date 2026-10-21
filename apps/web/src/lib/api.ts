@@ -71,7 +71,12 @@ export async function apiFetch<T>(
     throw new ApiError(errorMsg, response.status, json);
   }
 
-  // Desempaquetar { data: ... } si viene del interceptor estándar
+  // Si viene con metadatos de paginación { data: [...], meta: {...} }, retornar el objeto completo
+  if (json && "data" in json && "meta" in json) {
+    return json as T;
+  }
+
+  // Desempaquetar { data: ... } si viene del interceptor estándar simple
   if (json && "data" in json) {
     return json.data as T;
   }

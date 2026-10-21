@@ -17,6 +17,7 @@ import com.gestionut.conductor.data.repository.ViajeRepository;
 import com.gestionut.conductor.di.DatabaseModule_ProvideAppDatabaseFactory;
 import com.gestionut.conductor.di.DatabaseModule_ProvidePuntoTrackingDaoFactory;
 import com.gestionut.conductor.di.NetworkModule_ProvideAuthApiFactory;
+import com.gestionut.conductor.di.NetworkModule_ProvideDynamicBaseUrlInterceptorFactory;
 import com.gestionut.conductor.di.NetworkModule_ProvideOkHttpClientFactory;
 import com.gestionut.conductor.di.NetworkModule_ProvideRetrofitFactory;
 import com.gestionut.conductor.di.NetworkModule_ProvideViajesApiFactory;
@@ -54,6 +55,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import javax.annotation.processing.Generated;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
@@ -409,15 +411,15 @@ public final class DaggerGestionUTApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_gestionut_conductor_ui_screens_viaje_ViajeActivoViewModel = "com.gestionut.conductor.ui.screens.viaje.ViajeActivoViewModel";
-
       static String com_gestionut_conductor_ui_screens_login_LoginReservasViewModel = "com.gestionut.conductor.ui.screens.login.LoginReservasViewModel";
 
-      @KeepFieldType
-      ViajeActivoViewModel com_gestionut_conductor_ui_screens_viaje_ViajeActivoViewModel2;
+      static String com_gestionut_conductor_ui_screens_viaje_ViajeActivoViewModel = "com.gestionut.conductor.ui.screens.viaje.ViajeActivoViewModel";
 
       @KeepFieldType
       LoginReservasViewModel com_gestionut_conductor_ui_screens_login_LoginReservasViewModel2;
+
+      @KeepFieldType
+      ViajeActivoViewModel com_gestionut_conductor_ui_screens_viaje_ViajeActivoViewModel2;
     }
   }
 
@@ -597,6 +599,8 @@ public final class DaggerGestionUTApp_HiltComponents_SingletonC {
 
     private Provider<AuthInterceptor> authInterceptorProvider;
 
+    private Provider<Interceptor> provideDynamicBaseUrlInterceptorProvider;
+
     private Provider<OkHttpClient> provideOkHttpClientProvider;
 
     private Provider<Retrofit> provideRetrofitProvider;
@@ -623,14 +627,15 @@ public final class DaggerGestionUTApp_HiltComponents_SingletonC {
     private void initialize(final ApplicationContextModule applicationContextModuleParam) {
       this.authPreferencesProvider = DoubleCheck.provider(new SwitchingProvider<AuthPreferences>(singletonCImpl, 5));
       this.authInterceptorProvider = DoubleCheck.provider(new SwitchingProvider<AuthInterceptor>(singletonCImpl, 4));
+      this.provideDynamicBaseUrlInterceptorProvider = DoubleCheck.provider(new SwitchingProvider<Interceptor>(singletonCImpl, 6));
       this.provideOkHttpClientProvider = DoubleCheck.provider(new SwitchingProvider<OkHttpClient>(singletonCImpl, 3));
       this.provideRetrofitProvider = DoubleCheck.provider(new SwitchingProvider<Retrofit>(singletonCImpl, 2));
       this.provideAuthApiProvider = DoubleCheck.provider(new SwitchingProvider<AuthApi>(singletonCImpl, 1));
       this.authRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<AuthRepository>(singletonCImpl, 0));
-      this.provideViajesApiProvider = DoubleCheck.provider(new SwitchingProvider<ViajesApi>(singletonCImpl, 7));
-      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 9));
-      this.providePuntoTrackingDaoProvider = DoubleCheck.provider(new SwitchingProvider<PuntoTrackingDao>(singletonCImpl, 8));
-      this.viajeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<ViajeRepository>(singletonCImpl, 6));
+      this.provideViajesApiProvider = DoubleCheck.provider(new SwitchingProvider<ViajesApi>(singletonCImpl, 8));
+      this.provideAppDatabaseProvider = DoubleCheck.provider(new SwitchingProvider<AppDatabase>(singletonCImpl, 10));
+      this.providePuntoTrackingDaoProvider = DoubleCheck.provider(new SwitchingProvider<PuntoTrackingDao>(singletonCImpl, 9));
+      this.viajeRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<ViajeRepository>(singletonCImpl, 7));
     }
 
     @Override
@@ -676,7 +681,7 @@ public final class DaggerGestionUTApp_HiltComponents_SingletonC {
           return (T) NetworkModule_ProvideRetrofitFactory.provideRetrofit(singletonCImpl.provideOkHttpClientProvider.get());
 
           case 3: // okhttp3.OkHttpClient 
-          return (T) NetworkModule_ProvideOkHttpClientFactory.provideOkHttpClient(singletonCImpl.authInterceptorProvider.get());
+          return (T) NetworkModule_ProvideOkHttpClientFactory.provideOkHttpClient(singletonCImpl.authInterceptorProvider.get(), singletonCImpl.provideDynamicBaseUrlInterceptorProvider.get());
 
           case 4: // com.gestionut.conductor.data.remote.AuthInterceptor 
           return (T) new AuthInterceptor(singletonCImpl.authPreferencesProvider.get());
@@ -684,16 +689,19 @@ public final class DaggerGestionUTApp_HiltComponents_SingletonC {
           case 5: // com.gestionut.conductor.data.preferences.AuthPreferences 
           return (T) new AuthPreferences(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
-          case 6: // com.gestionut.conductor.data.repository.ViajeRepository 
+          case 6: // @javax.inject.Named("dynamicBaseUrl") okhttp3.Interceptor 
+          return (T) NetworkModule_ProvideDynamicBaseUrlInterceptorFactory.provideDynamicBaseUrlInterceptor(singletonCImpl.authPreferencesProvider.get());
+
+          case 7: // com.gestionut.conductor.data.repository.ViajeRepository 
           return (T) new ViajeRepository(singletonCImpl.provideViajesApiProvider.get(), singletonCImpl.providePuntoTrackingDaoProvider.get(), singletonCImpl.authPreferencesProvider.get());
 
-          case 7: // com.gestionut.conductor.data.remote.api.ViajesApi 
+          case 8: // com.gestionut.conductor.data.remote.api.ViajesApi 
           return (T) NetworkModule_ProvideViajesApiFactory.provideViajesApi(singletonCImpl.provideRetrofitProvider.get());
 
-          case 8: // com.gestionut.conductor.data.local.dao.PuntoTrackingDao 
+          case 9: // com.gestionut.conductor.data.local.dao.PuntoTrackingDao 
           return (T) DatabaseModule_ProvidePuntoTrackingDaoFactory.providePuntoTrackingDao(singletonCImpl.provideAppDatabaseProvider.get());
 
-          case 9: // com.gestionut.conductor.data.local.AppDatabase 
+          case 10: // com.gestionut.conductor.data.local.AppDatabase 
           return (T) DatabaseModule_ProvideAppDatabaseFactory.provideAppDatabase(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           default: throw new AssertionError(id);

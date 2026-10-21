@@ -90,11 +90,9 @@ export default function ConductoresPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await apiFetch<{
-        data: Conductor[];
-        meta: { total: number };
-      }>("/conductores?limit=100");
-      setData(res.data || []);
+      const res = await apiFetch<any>("/conductores?limit=100");
+      const items = Array.isArray(res) ? res : (res?.data || []);
+      setData(items);
     } catch (err: unknown) {
       console.error("Error al cargar conductores", err);
     } finally {
@@ -154,9 +152,10 @@ export default function ConductoresPage() {
           body: JSON.stringify(values),
         });
       } else {
+        const { activo, ...createPayload } = values;
         await apiFetch("/conductores", {
           method: "POST",
-          body: JSON.stringify(values),
+          body: JSON.stringify(createPayload),
         });
       }
       setModalOpen(false);

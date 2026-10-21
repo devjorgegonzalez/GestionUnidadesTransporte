@@ -32,7 +32,7 @@ export class ConductoresService {
     const created = await this.conductorModel.create({
       ...dto,
       cedula: cleanCedula,
-      activo: true,
+      activo: typeof dto.activo === 'boolean' ? dto.activo : true,
     });
     return created;
   }

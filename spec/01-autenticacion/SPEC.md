@@ -34,7 +34,7 @@ Colección: `usuarios_admin`
 ### 3.2 Login Conductor (App Móvil)
 1. El conductor ingresa en la pantalla inicial de la app Android:
    - `cedula`: Cédula de identidad del conductor.
-   - `placa`: Placa de la Unidad de Transporte (se normaliza a mayúsculas y sin espacios extra).
+   - `placa`: Placa de la Unidad de Transporte (exactamente 7 caracteres alfanuméricos en mayúsculas `^[A-Z0-9]{7}$`, sin espacios ni guiones, ej. `ABC1001`).
 2. El backend valida:
    - Que exista un conductor registrado con esa `cedula` y esté activo.
    - Que exista una Unidad de Transporte registrada con esa `placa` y no esté `INACTIVA` ni `EN_MANTENIMIENTO`.
@@ -46,7 +46,7 @@ Colección: `usuarios_admin`
      "cedula": "12345678",
      "nombreCompleto": "Juan Pérez",
      "utId": "utObjectId",
-     "placa": "ABC-123"
+     "placa": "ABC1001"
    }
    ```
 4. Además del token, el endpoint devuelve los datos básicos del conductor, de la UT y la lista de reservas disponibles para ese día (en estado `PROGRAMADA` o `EN_CURSO`) asociadas a ese binomio `conductor + UT`.

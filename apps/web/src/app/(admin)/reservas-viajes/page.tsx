@@ -200,10 +200,10 @@ export default function ReservasViajesPage() {
         apiFetch<ConductorOption[]>("/conductores/activos"),
         apiFetch<PuntoFrecuenteOption[]>("/puntos-frecuentes/activos"),
       ]);
-      setData(reservasRes.data || []);
-      setUts(utsRes.data || []);
-      setConductores(condRes || []);
-      setPuntosFrecuentes(puntosRes || []);
+      setData(Array.isArray(reservasRes) ? reservasRes : (reservasRes as any)?.data || []);
+      setUts(Array.isArray(utsRes) ? utsRes : (utsRes as any)?.data || []);
+      setConductores(Array.isArray(condRes) ? condRes : (condRes as any)?.data || []);
+      setPuntosFrecuentes(Array.isArray(puntosRes) ? puntosRes : (puntosRes as any)?.data || []);
     } catch (err: unknown) {
       console.error("Error al cargar reservas de viajes", err);
     } finally {

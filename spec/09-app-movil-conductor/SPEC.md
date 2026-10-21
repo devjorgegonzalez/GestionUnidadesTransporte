@@ -21,7 +21,7 @@ Desarrollar la aplicación móvil nativa para **Android 14+ (API 34+)** enfocada
 ### 3.1 Pantalla 1: Ingreso y Búsqueda de Reservas del Día (`LoginReservasScreen`)
 1. **Formulario de Identificación:**
    - Campo `Cédula de Identidad` (teclado numérico/texto).
-   - Campo `Placa de la UT` (normalizado automáticamente a mayúsculas, ej. `ABC-123`).
+   - Campo `Placa de la UT` (exactamente 7 caracteres alfanuméricos en mayúsculas, sin espacios ni guiones, ej. `ABC1001`).
    - Botón **"Buscar Reservas de Hoy"**.
 2. **Comportamiento:**
    - Consume `POST /api/v1/auth/conductor/login`.

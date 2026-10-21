@@ -10,7 +10,7 @@ Colección: `reservas_viajes`
 | :--- | :--- | :---: | :--- |
 | `_id` | `ObjectId` | Sí | Identificador único de la reserva/viaje |
 | `utId` | `ObjectId` | Sí | Referencia a `UnidadTransporte` |
-| `placaUt` | `string` | Sí | Snapshot de la placa de la UT (ej. `ABC-123`) |
+| `placaUt` | `string` | Sí | Snapshot de la placa de la UT (exactamente 7 caracteres alfanuméricos en mayúsculas, ej. `ABC1001`) |
 | `conductorId` | `ObjectId` | Sí | Referencia a `Conductor` |
 | `cedulaConductor` | `string` | Sí | Snapshot de la cédula del conductor |
 | `nombreConductor` | `string` | Sí | Snapshot del nombre completo del conductor |

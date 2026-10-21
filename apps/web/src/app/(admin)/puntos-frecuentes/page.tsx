@@ -92,11 +92,9 @@ export default function PuntosFrecuentesPage() {
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await apiFetch<{
-        data: PuntoFrecuente[];
-        meta: { total: number };
-      }>("/puntos-frecuentes?limit=100");
-      setData(res.data || []);
+      const res = await apiFetch<any>("/puntos-frecuentes?limit=100");
+      const items = Array.isArray(res) ? res : (res?.data || []);
+      setData(items);
     } catch (err: unknown) {
       console.error("Error al cargar puntos frecuentes", err);
     } finally {

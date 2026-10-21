@@ -23,7 +23,7 @@ export class UnidadesTransporteService {
   ) {}
 
   async create(dto: CreateUnidadTransporteDto) {
-    const cleanPlaca = dto.placa.toUpperCase().trim();
+    const cleanPlaca = dto.placa.toUpperCase().trim().replace(/[\s-]/g, '');
     const existing = await this.utModel.findOne({ placa: cleanPlaca });
     if (existing) {
       throw new ConflictException(
@@ -113,7 +113,7 @@ export class UnidadesTransporteService {
     }
 
     if (dto.placa) {
-      const cleanPlaca = dto.placa.toUpperCase().trim();
+      const cleanPlaca = dto.placa.toUpperCase().trim().replace(/[\s-]/g, '');
       const existing = await this.utModel.findOne({
         placa: cleanPlaca,
         _id: { $ne: ut._id },

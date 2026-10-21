@@ -31,7 +31,7 @@ class ViajeRepository @Inject constructor(
         return try {
             val response = viajesApi.getReservasHoy()
             if (response.isSuccessful && response.body() != null) {
-                Result.success(response.body()!!)
+                Result.success(response.body()!!.data)
             } else {
                 val errorMsg = response.errorBody()?.string() ?: "Error al obtener reservas (${response.code()})"
                 Result.failure(Exception(errorMsg))
@@ -46,7 +46,7 @@ class ViajeRepository @Inject constructor(
             val response = viajesApi.iniciarViaje(viajeId)
             if (response.isSuccessful && response.body() != null) {
                 authPreferences.setActiveViajeId(viajeId)
-                Result.success(response.body()!!)
+                Result.success(response.body()!!.data)
             } else {
                 val errorMsg = response.errorBody()?.string() ?: "Error al iniciar viaje (${response.code()})"
                 Result.failure(Exception(errorMsg))
@@ -121,7 +121,7 @@ class ViajeRepository @Inject constructor(
                     puntoTrackingDao.marcarComoSincronizados(pendientes.map { it.idPuntoCliente })
                 }
                 authPreferences.setActiveViajeId(null)
-                Result.success(response.body()!!)
+                Result.success(response.body()!!.data)
             } else {
                 val errorMsg = response.errorBody()?.string() ?: "Error al finalizar viaje (${response.code()})"
                 Result.failure(Exception(errorMsg))

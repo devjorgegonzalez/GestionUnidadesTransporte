@@ -32,7 +32,14 @@ export class Mantenimiento {
   @Prop({ type: Types.ObjectId, ref: 'UnidadTransporte', required: true })
   utId: Types.ObjectId;
 
-  @Prop({ required: true, uppercase: true, trim: true })
+  @Prop({
+    required: true,
+    uppercase: true,
+    trim: true,
+    minlength: 7,
+    maxlength: 7,
+    match: /^[A-Z0-9]{7}$/,
+  })
   placaUt: string;
 
   @Prop({ required: true, min: 0 })

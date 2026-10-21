@@ -136,9 +136,9 @@ export default function MantenimientosPage() {
         apiFetch<{ data: UnidadTransporte[] }>("/unidades-transporte?limit=100"),
         apiFetch<CatalogoTarea[]>("/mantenimientos/catalogo-checklist"),
       ]);
-      setData(mantenimientosRes.data || []);
-      setUts(utsRes.data || []);
-      setCatalogo(catalogoRes || []);
+      setData(Array.isArray(mantenimientosRes) ? mantenimientosRes : (mantenimientosRes as any)?.data || []);
+      setUts(Array.isArray(utsRes) ? utsRes : (utsRes as any)?.data || []);
+      setCatalogo(Array.isArray(catalogoRes) ? catalogoRes : (catalogoRes as any)?.data || []);
     } catch (err: unknown) {
       console.error("Error al cargar mantenimientos", err);
     } finally {

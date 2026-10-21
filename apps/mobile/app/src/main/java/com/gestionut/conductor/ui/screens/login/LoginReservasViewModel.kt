@@ -63,16 +63,24 @@ class LoginReservasViewModel @Inject constructor(
     }
 
     fun onPlacaChange(value: String) {
-        _uiState.value = _uiState.value.copy(placa = value.uppercase(), errorMessage = null)
+        val sanitized = value.uppercase().filter { it.isLetterOrDigit() }.take(7)
+        _uiState.value = _uiState.value.copy(placa = sanitized, errorMessage = null)
     }
 
     fun buscarReservas() {
         val cedula = _uiState.value.cedula.trim()
-        val placa = _uiState.value.placa.trim().uppercase()
+        val placa = _uiState.value.placa.trim().uppercase().filter { it.isLetterOrDigit() }
 
         if (cedula.isBlank() || placa.isBlank()) {
             _uiState.value = _uiState.value.copy(
                 errorMessage = "Por favor ingrese la cédula y la placa de la UT."
+            )
+            return
+        }
+
+        if (placa.length != 7) {
+            _uiState.value = _uiState.value.copy(
+                errorMessage = "La placa debe tener exactamente 7 caracteres alfanuméricos (ej. ABC1001)."
             )
             return
         }
@@ -92,11 +100,19 @@ class LoginReservasViewModel @Inject constructor(
 
             // Step 2: Fetch today's reservations
             val reservasResult = viajeRepository.getReservasHoy()
+            val reservasList = if (reservasResult.isSuccess && reservasResult.getOrNull()?.isNotEmpty() == true) {
+                reservasResult.getOrDefault(emptyList())
+            } else {
+                loginResult.getOrNull()?.reservasDelDia ?: emptyList()
+            }
+
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
                 busquedaRealizada = true,
-                reservas = reservasResult.getOrDefault(emptyList()),
-                errorMessage = reservasResult.exceptionOrNull()?.message
+                reservas = reservasList,
+                errorMessage = if (reservasList.isEmpty() && reservasResult.isFailure) {
+                    reservasResult.exceptionOrNull()?.message
+                } else null
             )
         }
     }
@@ -130,6 +146,12 @@ class LoginReservasViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.logout()
             _uiState.value = LoginReservasUiState()
+        }
+    }
+
+    fun updateServerUrl(url: String?) {
+        viewModelScope.launch {
+            authPreferences.setCustomBaseUrl(url?.trim()?.ifBlank { null })
         }
     }
 }

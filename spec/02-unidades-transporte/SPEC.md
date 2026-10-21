@@ -9,7 +9,7 @@ Colección: `unidades_transporte`
 | Campo | Tipo | Requerido | Único | Descripción |
 | :--- | :--- | :---: | :---: | :--- |
 | `_id` | `ObjectId` | Sí | Sí | Identificador único |
-| `placa` | `string` | Sí | Sí | Placa normalizada en mayúsculas (ej. `ABC-123`) |
+| `placa` | `string` | Sí | Sí | Placa normalizada en mayúsculas, exactamente 7 caracteres alfanuméricos sin espacios ni guiones (ej. `ABC1001`, regex `^[A-Z0-9]{7}$`) |
 | `marca` | `string` | Sí | No | Marca del vehículo (ej. `Toyota`, `Ford`) |
 | `modelo` | `string` | Sí | No | Modelo del vehículo (ej. `Hilux`, `Transit`) |
 | `anio` | `number` | Sí | No | Año de fabricación (ej. `1990` - `año actual + 1`) |
@@ -25,7 +25,7 @@ Colección: `unidades_transporte`
 - `{ estado: 1 }`
 
 ## 3. Reglas de Negocio
-1. **Normalización de Placa:** Al crear o editar una UT, la `placa` se convierte a mayúsculas y se eliminan espacios al inicio/final. No pueden existir dos UTs con la misma placa (`409 Conflict`).
+1. **Formato y Normalización de Placa:** La placa debe contener obligatoriamente **exactamente 7 caracteres alfanuméricos** (solo letras y números en mayúsculas `^[A-Z0-9]{7}$`), sin guiones `-`, sin espacios ni caracteres especiales (ej. `ABC1001`). Al recibirla, se limpia de espacios y se convierte a mayúsculas. No pueden existir dos UTs con la misma placa (`409 Conflict`), y si no cumple el formato se rechaza con `400 Bad Request`.
 2. **Estados Iniciales Permitidos al Crear:** Al registrar una nueva UT manualmente, el usuario solo puede elegir entre `DISPONIBLE` o `INACTIVA` (por defecto `DISPONIBLE`). Los estados `VIAJANDO` y `EN_MANTENIMIENTO` son activados exclusivamente por los módulos de Viajes y Mantenimientos respectivamente.
 3. **Restricción Estricta de Cambio de Estado:**
    - Si la UT tiene estado `VIAJANDO` (tiene un viaje activo) o `EN_MANTENIMIENTO` (tiene un mantenimiento en estado borrador/en curso), **no se permite cambiar su estado** desde el formulario de edición de UT (`400 Bad Request` en el backend y selector de estado deshabilitado con tooltip explicativo en la Web).
@@ -55,6 +55,7 @@ Colección: `unidades_transporte`
     - Si la UT está `VIAJANDO` o `EN_MANTENIMIENTO`, el campo `estado` aparece bloqueado (`disabled`) mostrando un mensaje informativo: *"El estado no puede modificarse manualmente mientras la unidad tiene un viaje activo o está en mantenimiento"*.
 
 ## 6. Criterios de Aceptación
+- [ ] La placa es validada estrictamente: exactamente 7 caracteres alfanuméricos en mayúsculas (`^[A-Z0-9]{7}$`), sin guiones ni espacios.
 - [ ] No se permite duplicar una placa existente.
 - [ ] El backend rechaza con `400 Bad Request` cualquier intento de cambiar el estado de una UT que esté `VIAJANDO` o `EN_MANTENIMIENTO` desde el endpoint de edición de UT.
 - [ ] La tabla en Next.js filtra, pagina y ordena las UTs utilizando TanStack Table.

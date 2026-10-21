@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,11 +8,12 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-val localProps = java.util.Properties().apply {
+val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
-    if (f.exists()) load(f.inputStream())
+    if (f.exists()) f.inputStream().use { load(it) }
 }
-val mapsApiKey = localProps.getProperty("MAPS_API_KEY") ?: System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
+val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
+val apiBaseUrl: String = localProps.getProperty("API_BASE_URL") ?: System.getenv("API_BASE_URL") ?: "http://192.168.0.160:10102/api/v1/"
 
 android {
     namespace = "com.gestionut.conductor"
@@ -28,8 +31,8 @@ android {
             useSupportLibrary = true
         }
 
-        // Default API base URL: 10.0.2.2 is Android Emulator localhost loopback
-        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:10102/api/v1/\"")
+        // Default API base URL: Local host IP on Wi-Fi
+        buildConfigField("String", "BASE_URL", "\"$apiBaseUrl\"")
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 

@@ -132,7 +132,7 @@ export class SeedService implements OnApplicationBootstrap {
   private async seedUnidadesTransporte() {
     const vehiculos = [
       {
-        placa: 'ABC-101',
+        placa: 'ABC1001',
         marca: 'Toyota',
         modelo: 'Dyna 4.0 Industrial',
         anio: 2021,
@@ -142,7 +142,7 @@ export class SeedService implements OnApplicationBootstrap {
         estado: EstadoUnidadTransporte.DISPONIBLE,
       },
       {
-        placa: 'VAN-202',
+        placa: 'VAN2002',
         marca: 'Ford',
         modelo: 'Transit Pasajeros',
         anio: 2022,
@@ -152,7 +152,7 @@ export class SeedService implements OnApplicationBootstrap {
         estado: EstadoUnidadTransporte.VIAJANDO,
       },
       {
-        placa: 'SUV-303',
+        placa: 'SUV3003',
         marca: 'Toyota',
         modelo: 'Fortuner 4x4',
         anio: 2023,
@@ -162,7 +162,7 @@ export class SeedService implements OnApplicationBootstrap {
         estado: EstadoUnidadTransporte.DISPONIBLE,
       },
       {
-        placa: 'PCK-404',
+        placa: 'PCK4004',
         marca: 'Toyota',
         modelo: 'Hilux Doble Cabina',
         anio: 2020,
@@ -172,7 +172,7 @@ export class SeedService implements OnApplicationBootstrap {
         estado: EstadoUnidadTransporte.EN_MANTENIMIENTO,
       },
       {
-        placa: 'SED-505',
+        placa: 'SED5005',
         marca: 'Toyota',
         modelo: 'Corolla GLi',
         anio: 2019,
@@ -182,7 +182,7 @@ export class SeedService implements OnApplicationBootstrap {
         estado: EstadoUnidadTransporte.DISPONIBLE,
       },
       {
-        placa: 'MOT-606',
+        placa: 'MOT6006',
         marca: 'Yamaha',
         modelo: 'YBR 125 Express',
         anio: 2022,
@@ -292,7 +292,7 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   private async seedMantenimiento() {
-    const pckUt = await this.utModel.findOne({ placa: 'PCK-404' });
+    const pckUt = await this.utModel.findOne({ placa: 'PCK4004' });
     if (!pckUt) return;
 
     const existingMant = await this.mantenimientoModel.findOne({
@@ -321,9 +321,9 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   private async seedReservasYViajes() {
-    const utAbc = await this.utModel.findOne({ placa: 'ABC-101' });
-    const utVan = await this.utModel.findOne({ placa: 'VAN-202' });
-    const utSed = await this.utModel.findOne({ placa: 'SED-505' });
+    const utAbc = await this.utModel.findOne({ placa: 'ABC1001' });
+    const utVan = await this.utModel.findOne({ placa: 'VAN2002' });
+    const utSed = await this.utModel.findOne({ placa: 'SED5005' });
 
     const condCarlos = await this.conductorModel.findOne({ cedula: '19876543' });
     const condManuel = await this.conductorModel.findOne({ cedula: '18234567' });
@@ -334,7 +334,7 @@ export class SeedService implements OnApplicationBootstrap {
     const hoy = new Date();
     hoy.setHours(9, 0, 0, 0);
 
-    // 1. Reserva PROGRAMADA para hoy (Conductor Carlos Pérez / UT ABC-101)
+    // 1. Reserva PROGRAMADA para hoy (Conductor Carlos Pérez / UT ABC1001)
     const existingProg = await this.reservaModel.findOne({
       placaUt: utAbc.placa,
       cedulaConductor: condCarlos.cedula,
@@ -368,7 +368,7 @@ export class SeedService implements OnApplicationBootstrap {
       });
     }
 
-    // 2. Viaje EN_CURSO con telemetría activa (Conductor Manuel Gómez / UT VAN-202)
+    // 2. Viaje EN_CURSO con telemetría activa (Conductor Manuel Gómez / UT VAN2002)
     const existingEnCurso = await this.reservaModel.findOne({
       placaUt: utVan.placa,
       cedulaConductor: condManuel.cedula,

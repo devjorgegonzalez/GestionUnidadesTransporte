@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  Matches,
   Max,
   Min,
 } from 'class-validator';
@@ -16,11 +17,21 @@ import {
 } from '../../database/schemas/unidad-transporte.schema.js';
 
 export class CreateUnidadTransporteDto {
-  @ApiProperty({ example: 'ABC-123', description: 'Placa del vehículo' })
+  @ApiProperty({
+    example: 'ABC1001',
+    description:
+      'Placa del vehículo (exactamente 7 caracteres alfanuméricos en mayúsculas, sin guiones ni espacios)',
+  })
   @IsString({ message: 'La placa debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'La placa es requerida' })
+  @Matches(/^[A-Z0-9]{7}$/, {
+    message:
+      'La placa debe tener exactamente 7 caracteres alfanuméricos en mayúsculas (sin espacios ni guiones, ej. ABC1001)',
+  })
   @Transform(({ value }: { value: unknown }) =>
-    typeof value === 'string' ? value.toUpperCase().trim() : value,
+    typeof value === 'string'
+      ? value.toUpperCase().trim().replace(/[\s-]/g, '')
+      : value,
   )
   placa: string;
 

@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateConductorDto {
@@ -40,4 +40,13 @@ export class CreateConductorDto {
     typeof value === 'string' ? value.trim() : value,
   )
   telefono: string;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Estado activo/inactivo del conductor',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  activo?: boolean;
 }

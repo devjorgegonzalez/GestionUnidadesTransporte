@@ -33,7 +33,7 @@ Colección: `mantenimientos`
 | :--- | :--- | :---: | :--- |
 | `_id` | `ObjectId` | Sí | Identificador único |
 | `utId` | `ObjectId` | Sí | Referencia a `UnidadTransporte` |
-| `placaUt` | `string` | Sí | Snapshot de la placa de la UT |
+| `placaUt` | `string` | Sí | Snapshot de la placa de la UT (exactamente 7 caracteres alfanuméricos en mayúsculas, ej. `ABC1001`) |
 | `kilometrajeRegistro` | `number` | Sí | Kilometraje de la UT al momento de abrir el mantenimiento |
 | `estado` | `enum` | Sí | `BORRADOR` (mantenimiento en curso), `FINALIZADO` |
 | `tareasChecklist` | `Array<ItemTarea>` | Sí | Lista de tareas base marcadas (`{ nombre: string, seleccionada: boolean, esManual: false }`) |

@@ -8,10 +8,11 @@ import dagger.internal.QualifierMetadata;
 import dagger.internal.ScopeMetadata;
 import javax.annotation.processing.Generated;
 import javax.inject.Provider;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 
 @ScopeMetadata("javax.inject.Singleton")
-@QualifierMetadata
+@QualifierMetadata("javax.inject.Named")
 @DaggerGenerated
 @Generated(
     value = "dagger.internal.codegen.ComponentProcessor",
@@ -27,22 +28,27 @@ import okhttp3.OkHttpClient;
 public final class NetworkModule_ProvideOkHttpClientFactory implements Factory<OkHttpClient> {
   private final Provider<AuthInterceptor> authInterceptorProvider;
 
-  public NetworkModule_ProvideOkHttpClientFactory(
-      Provider<AuthInterceptor> authInterceptorProvider) {
+  private final Provider<Interceptor> dynamicBaseUrlInterceptorProvider;
+
+  public NetworkModule_ProvideOkHttpClientFactory(Provider<AuthInterceptor> authInterceptorProvider,
+      Provider<Interceptor> dynamicBaseUrlInterceptorProvider) {
     this.authInterceptorProvider = authInterceptorProvider;
+    this.dynamicBaseUrlInterceptorProvider = dynamicBaseUrlInterceptorProvider;
   }
 
   @Override
   public OkHttpClient get() {
-    return provideOkHttpClient(authInterceptorProvider.get());
+    return provideOkHttpClient(authInterceptorProvider.get(), dynamicBaseUrlInterceptorProvider.get());
   }
 
   public static NetworkModule_ProvideOkHttpClientFactory create(
-      Provider<AuthInterceptor> authInterceptorProvider) {
-    return new NetworkModule_ProvideOkHttpClientFactory(authInterceptorProvider);
+      Provider<AuthInterceptor> authInterceptorProvider,
+      Provider<Interceptor> dynamicBaseUrlInterceptorProvider) {
+    return new NetworkModule_ProvideOkHttpClientFactory(authInterceptorProvider, dynamicBaseUrlInterceptorProvider);
   }
 
-  public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor) {
-    return Preconditions.checkNotNullFromProvides(NetworkModule.INSTANCE.provideOkHttpClient(authInterceptor));
+  public static OkHttpClient provideOkHttpClient(AuthInterceptor authInterceptor,
+      Interceptor dynamicBaseUrlInterceptor) {
+    return Preconditions.checkNotNullFromProvides(NetworkModule.INSTANCE.provideOkHttpClient(authInterceptor, dynamicBaseUrlInterceptor));
   }
 }

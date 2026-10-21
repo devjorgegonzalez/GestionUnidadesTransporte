@@ -1,5 +1,6 @@
 package com.gestionut.conductor.data.remote.api
 
+import com.gestionut.conductor.data.remote.dto.ApiResponse
 import com.gestionut.conductor.data.remote.dto.LoginConductorRequest
 import com.gestionut.conductor.data.remote.dto.LoginConductorResponse
 import retrofit2.Response
@@ -10,5 +11,5 @@ interface AuthApi {
     @POST("auth/conductor/login")
     suspend fun loginConductor(
         @Body request: LoginConductorRequest
-    ): Response<LoginConductorResponse>
+    ): Response<ApiResponse<LoginConductorResponse>>
 }

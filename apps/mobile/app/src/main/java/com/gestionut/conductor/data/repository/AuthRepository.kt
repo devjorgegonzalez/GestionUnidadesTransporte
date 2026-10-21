@@ -21,12 +21,12 @@ class AuthRepository @Inject constructor(
             val response = authApi.loginConductor(
                 LoginConductorRequest(
                     cedula = cedula.trim(),
-                    placa = placa.trim().uppercase()
+                    placa = placa.trim().uppercase().filter { it.isLetterOrDigit() }
                 )
             )
 
             if (response.isSuccessful && response.body() != null) {
-                val body = response.body()!!
+                val body = response.body()!!.data
                 authPreferences.saveSession(
                     token = body.accessToken,
                     conductorId = body.conductor.id,

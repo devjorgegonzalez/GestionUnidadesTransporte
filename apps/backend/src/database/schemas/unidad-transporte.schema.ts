@@ -21,7 +21,15 @@ export enum EstadoUnidadTransporte {
 
 @Schema({ collection: 'unidades_transporte', timestamps: true })
 export class UnidadTransporte {
-  @Prop({ required: true, unique: true, uppercase: true, trim: true })
+  @Prop({
+    required: true,
+    unique: true,
+    uppercase: true,
+    trim: true,
+    minlength: 7,
+    maxlength: 7,
+    match: /^[A-Z0-9]{7}$/,
+  })
   placa: string;
 
   @Prop({ required: true, trim: true })
