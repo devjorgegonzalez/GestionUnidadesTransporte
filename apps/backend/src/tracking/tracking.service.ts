@@ -125,9 +125,10 @@ export class TrackingService {
       };
     }
 
-    // Procesar último lote si viene en la petición
-    if (dto && dto.puntos && dto.puntos.length > 0) {
-      await this.registrarBatch(viajeId, { puntos: dto.puntos });
+    // Procesar último lote si viene en la petición (soporta 'puntos' o 'puntosFinales')
+    const puntosAProcesar = dto?.puntos || dto?.puntosFinales;
+    if (puntosAProcesar && puntosAProcesar.length > 0) {
+      await this.registrarBatch(viajeId, { puntos: puntosAProcesar });
     }
 
     // Obtener todos los puntos GPS registrados para este viaje

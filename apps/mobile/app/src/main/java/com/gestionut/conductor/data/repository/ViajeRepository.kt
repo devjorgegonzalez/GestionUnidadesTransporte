@@ -115,7 +115,7 @@ class ViajeRepository @Inject constructor(
                 null
             }
 
-            val response = viajesApi.finalizarViaje(viajeId, FinalizarViajeRequest(dtosFinales))
+            val response = viajesApi.finalizarViaje(viajeId, FinalizarViajeRequest(puntos = dtosFinales))
             if (response.isSuccessful && response.body() != null) {
                 if (pendientes.isNotEmpty()) {
                     puntoTrackingDao.marcarComoSincronizados(pendientes.map { it.idPuntoCliente })

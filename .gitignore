@@ -20,6 +20,7 @@ dist/
 .next/
 out/
 build/
+*.tsbuildinfo
 apps/backend/dist/
 apps/web/.next/
 apps/web/out/

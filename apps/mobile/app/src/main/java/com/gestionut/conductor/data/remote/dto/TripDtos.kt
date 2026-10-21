@@ -81,7 +81,8 @@ data class TrackingBatchRequest(
 )
 
 data class FinalizarViajeRequest(
-    val puntosFinales: List<PuntoTrackingInputDto>? = null
+    @SerializedName("puntos", alternate = ["puntosFinales"])
+    val puntos: List<PuntoTrackingInputDto>? = null
 )
 
 data class ViajeResponseDto(
@@ -92,6 +93,8 @@ data class ViajeResponseDto(
     val kilometrajeReal: Double? = null,
     @SerializedName("excedeUmbralKm", alternate = ["excesoKilometraje"])
     val excesoKilometraje: Boolean? = null,
+    @SerializedName("porcentajeDesviacionKm")
+    val porcentajeDesviacionKm: Double? = null,
     val fechaFin: String? = null,
     val mensaje: String? = null,
     val reserva: ReservaDto? = null

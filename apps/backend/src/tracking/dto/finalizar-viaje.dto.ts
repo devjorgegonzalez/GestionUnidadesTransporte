@@ -13,4 +13,14 @@ export class FinalizarViajeDto {
   @ValidateNested({ each: true })
   @Type(() => PuntoGpsDto)
   puntos?: PuntoGpsDto[];
+
+  @ApiPropertyOptional({
+    type: [PuntoGpsDto],
+    description: 'Alias alternativo de puntos GPS finales',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => PuntoGpsDto)
+  puntosFinales?: PuntoGpsDto[];
 }

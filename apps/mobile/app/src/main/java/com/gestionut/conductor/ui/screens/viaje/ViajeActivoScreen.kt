@@ -59,16 +59,91 @@ fun ViajeActivoScreen(
 
     var showConfirmDialog by remember { mutableStateOf(false) }
 
+    // Loading dialog while finalizing
+    if (state.isLoadingFinalizar) {
+        AlertDialog(
+            onDismissRequest = { /* In progress */ },
+            confirmButton = { },
+            title = {
+                Text("Finalizando Viaje...", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            },
+            text = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(vertical = 12.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(36.dp),
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 3.dp
+                    )
+                    Text(
+                        text = "Sincronizando puntos GPS y calculando odómetro final...",
+                        fontSize = 14.sp
+                    )
+                }
+            }
+        )
+    }
+
+    // Error dialog if finalizing trip fails
+    if (state.errorMessage != null) {
+        AlertDialog(
+            onDismissRequest = { viewModel.limpiarError() },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = Color(0xFFDC2626),
+                    modifier = Modifier.size(44.dp)
+                )
+            },
+            title = {
+                Text(
+                    text = "No se pudo terminar el viaje",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Ocurrió un inconveniente al comunicarse con el servidor:")
+                    Text(
+                        text = state.errorMessage ?: "Error desconocido.",
+                        color = Color(0xFFDC2626),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp
+                    )
+                    Text("Verifique la conexión de red y vuelva a presionar 'Terminar Viaje'.")
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.limpiarError() },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Entendido")
+                }
+            }
+        )
+    }
+
     // Summary dialog when trip successfully ends
     if (state.viajeFinalizadoResumen != null) {
         val resumen = state.viajeFinalizadoResumen!!
+        val kmRealDisplay = resumen.kilometrajeReal
+            ?: resumen.reserva?.kilometrajeReal
+            ?: state.kmRecorridoEstimado
+        val esExceso = resumen.excesoKilometraje == true || resumen.reserva?.excesoKilometraje == true
+
         AlertDialog(
             onDismissRequest = { /* Require user to click button */ },
             icon = {
                 Icon(
-                    imageVector = if (resumen.excesoKilometraje == true) Icons.Default.Warning else Icons.Default.CheckCircle,
+                    imageVector = if (esExceso) Icons.Default.Warning else Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = if (resumen.excesoKilometraje == true) Color(0xFFD97706) else Color(0xFF16A34A),
+                    tint = if (esExceso) Color(0xFFD97706) else Color(0xFF16A34A),
                     modifier = Modifier.size(44.dp)
                 )
             },
@@ -83,14 +158,14 @@ fun ViajeActivoScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("El viaje ha sido registrado exitosamente.")
                     Text(
-                        text = "Kilometraje Real: ${resumen.kilometrajeReal ?: state.kmRecorridoEstimado} km",
+                        text = "Kilometraje Real: $kmRealDisplay km",
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Kilometraje Sugerido: ${state.kmSugerido} km",
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    if (resumen.excesoKilometraje == true) {
+                    if (esExceso) {
                         Text(
                             text = "Aviso: El recorrido excedió en más de 10% el kilometraje sugerido por Google Maps.",
                             color = Color(0xFFD97706),

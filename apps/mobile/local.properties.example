@@ -1,0 +1,8 @@
+## Android SDK location (adjust to your local environment)
+# sdk.dir=C\:/Users/username/AppData/Local/Android/Sdk
+
+## Google Maps API Key for Android
+MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY_HERE
+
+## Backend API Base URL (use your machine's LAN IP for physical device testing or 10.0.2.2 for emulator)
+API_BASE_URL=http://192.168.0.X:10102/api/v1/

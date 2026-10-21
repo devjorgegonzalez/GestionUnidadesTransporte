@@ -117,6 +117,21 @@ class LoginReservasViewModel @Inject constructor(
         }
     }
 
+    fun refrescarReservasSilencioso() {
+        val cedula = _uiState.value.cedula.trim()
+        val placa = _uiState.value.placa.trim().uppercase().filter { it.isLetterOrDigit() }
+        if (cedula.isNotBlank() && placa.length == 7) {
+            viewModelScope.launch {
+                val reservasResult = viajeRepository.getReservasHoy()
+                if (reservasResult.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        reservas = reservasResult.getOrDefault(emptyList())
+                    )
+                }
+            }
+        }
+    }
+
     fun iniciarViaje(reserva: ReservaDto, context: Context, onNavigateToTrip: (ReservaDto) -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)

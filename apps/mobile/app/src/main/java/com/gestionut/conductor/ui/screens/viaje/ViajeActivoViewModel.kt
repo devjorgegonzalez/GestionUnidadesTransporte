@@ -118,6 +118,10 @@ class ViajeActivoViewModel @Inject constructor(
         return if (dist > 10000) 0.0 else dist // Filter outliers > 10km
     }
 
+    fun limpiarError() {
+        _uiState.value = _uiState.value.copy(errorMessage = null)
+    }
+
     fun terminarViaje(context: Context, onViajeTerminado: () -> Unit) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoadingFinalizar = true, errorMessage = null)
@@ -125,10 +129,9 @@ class ViajeActivoViewModel @Inject constructor(
             // Step 1: Call API to finalize trip and send any pending points
             val finishResult = viajeRepository.finalizarViaje(viajeId)
 
-            // Step 2: Stop Foreground tracking service
-            TrackingForegroundService.stopTracking(context)
-
             if (finishResult.isSuccess) {
+                // Step 2: Stop Foreground tracking service on success
+                TrackingForegroundService.stopTracking(context)
                 val resumen = finishResult.getOrNull()
                 _uiState.value = _uiState.value.copy(
                     isLoadingFinalizar = false,

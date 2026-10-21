@@ -17,6 +17,13 @@ export const metadata: Metadata = {
   title: "Gestión de Unidades de Transporte",
   description:
     "Sistema integral para la gestión y seguimiento de unidades de transporte.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
