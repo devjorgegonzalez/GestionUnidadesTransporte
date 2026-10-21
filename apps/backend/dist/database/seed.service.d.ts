@@ -1,0 +1,32 @@
+import { OnApplicationBootstrap } from '@nestjs/common';
+import { Model } from 'mongoose';
+import { ConfigService } from '@nestjs/config';
+import { UsuarioAdminDocument } from './schemas/usuario-admin.schema.js';
+import { CatalogoTareaMantenimientoDocument } from './schemas/catalogo-tarea.schema.js';
+import { UnidadTransporteDocument } from './schemas/unidad-transporte.schema.js';
+import { ConductorDocument } from './schemas/conductor.schema.js';
+import { PuntoFrecuenteDocument } from './schemas/punto-frecuente.schema.js';
+import { ReservaViajeDocument } from './schemas/reserva-viaje.schema.js';
+import { MantenimientoDocument } from './schemas/mantenimiento.schema.js';
+import { PuntoTrackingViajeDocument } from './schemas/punto-tracking.schema.js';
+export declare class SeedService implements OnApplicationBootstrap {
+    private readonly adminModel;
+    private readonly catalogoModel;
+    private readonly utModel;
+    private readonly conductorModel;
+    private readonly puntoFrecuenteModel;
+    private readonly reservaModel;
+    private readonly mantenimientoModel;
+    private readonly trackingModel;
+    private readonly configService;
+    private readonly logger;
+    constructor(adminModel: Model<UsuarioAdminDocument>, catalogoModel: Model<CatalogoTareaMantenimientoDocument>, utModel: Model<UnidadTransporteDocument>, conductorModel: Model<ConductorDocument>, puntoFrecuenteModel: Model<PuntoFrecuenteDocument>, reservaModel: Model<ReservaViajeDocument>, mantenimientoModel: Model<MantenimientoDocument>, trackingModel: Model<PuntoTrackingViajeDocument>, configService: ConfigService);
+    onApplicationBootstrap(): Promise<void>;
+    private seedAdmin;
+    private seedCatalogoTareas;
+    private seedUnidadesTransporte;
+    private seedConductores;
+    private seedPuntosFrecuentes;
+    private seedMantenimiento;
+    private seedReservasYViajes;
+}

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gestión UT Conductor</string>
+    <string name="tracking_notification_channel">Tracking de Viaje Activo</string>
+    <string name="tracking_notification_title">Viaje en curso</string>
+    <string name="tracking_notification_desc">Registrando recorrido de UT</string>
+</resources>

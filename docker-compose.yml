@@ -1,0 +1,71 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: gestion_ut_mongodb
+    restart: unless-stopped
+    ports:
+      - "10103:27017"
+    environment:
+      MONGO_INITDB_DATABASE: gestion_ut
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - gestion_ut_network
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    container_name: gestion_ut_backend
+    restart: unless-stopped
+    ports:
+      - "10102:4000"
+    environment:
+      PORT: 4000
+      NODE_ENV: development
+      MONGODB_URI: mongodb://mongodb:27017/gestion_ut
+      JWT_SECRET: super_secret_jwt_key_change_in_prod
+      JWT_EXPIRES_IN_ADMIN: 8h
+      JWT_EXPIRES_IN_DRIVER: 24h
+      ADMIN_DEFAULT_EMAIL: admin@empresa.com
+      ADMIN_DEFAULT_PASSWORD: Admin123*
+      CORS_ORIGIN: http://localhost:10101
+      GOOGLE_MAPS_SERVER_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - gestion_ut_network
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:10102/api/v1
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+    container_name: gestion_ut_web
+    restart: unless-stopped
+    ports:
+      - "10101:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:10102/api/v1
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+    depends_on:
+      - backend
+    networks:
+      - gestion_ut_network
+
+volumes:
+  mongodb_data:
+    driver: local
+
+networks:
+  gestion_ut_network:
+    driver: bridge
