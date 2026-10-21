@@ -6,6 +6,12 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+val localProps = java.util.Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) load(f.inputStream())
+}
+val mapsApiKey = localProps.getProperty("MAPS_API_KEY") ?: System.getenv("GOOGLE_MAPS_API_KEY") ?: ""
+
 android {
     namespace = "com.gestionut.conductor"
     compileSdk = 34
@@ -24,6 +30,7 @@ android {
 
         // Default API base URL: 10.0.2.2 is Android Emulator localhost loopback
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:10102/api/v1/\"")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {

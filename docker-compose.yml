@@ -36,7 +36,7 @@ services:
       ADMIN_DEFAULT_EMAIL: admin@empresa.com
       ADMIN_DEFAULT_PASSWORD: Admin123*
       CORS_ORIGIN: http://localhost:10101
-      GOOGLE_MAPS_SERVER_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+      GOOGLE_MAPS_SERVER_API_KEY: ${GOOGLE_MAPS_SERVER_API_KEY:-}
     depends_on:
       mongodb:
         condition: service_healthy
@@ -48,15 +48,15 @@ services:
       context: ./apps/web
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_API_URL: http://localhost:10102/api/v1
-        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:10102/api/v1}
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
     container_name: gestion_ut_web
     restart: unless-stopped
     ports:
       - "10101:3000"
     environment:
-      NEXT_PUBLIC_API_URL: http://localhost:10102/api/v1
-      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: "AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60"
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:10102/api/v1}
+      NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-}
     depends_on:
       - backend
     networks:

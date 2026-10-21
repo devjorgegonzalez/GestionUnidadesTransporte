@@ -25,10 +25,10 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:usesCleartextTraffic="true">
 
-        <!-- Google Maps API Key -->
+        <!-- Google Maps API Key loaded via Gradle manifestPlaceholders from local.properties -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60" />
+            android:value="${MAPS_API_KEY}" />
 
         <activity
             android:name=".ui.MainActivity"

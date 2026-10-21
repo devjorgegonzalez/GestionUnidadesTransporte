@@ -15,7 +15,7 @@ Todos los servicios se encuentran orquestados y activos mediante `docker compose
 | **Documentación Swagger** | `gestion_ut_backend` | [http://localhost:10102/api/docs](http://localhost:10102/api/docs) | Catálogo interactivo OpenAPI de todos los endpoints |
 | **Base de Datos MongoDB** | `gestion_ut_mongodb` | `mongodb://localhost:10103/gestion_ut` | Mongo 7 compatible con Azure CosmosDB |
 
-- **Google Maps API Key:** `AIzaSyBgPOVFEC2_8RTZyC8B9ex53zmqySf5H60` (Configurada en Web, Backend y App Móvil).
+- **Google Maps API Key:** Configurada mediante variables de entorno en `.env` / `local.properties` (no expuesta en código fuente ni repositorios).
 
 Comandos de gestión:
 ```bash
