@@ -229,7 +229,7 @@ export default function PuntosFrecuentesPage() {
             Ubicaciones pre-registradas reutilizables como origen o destino en reservas de viajes.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
@@ -262,7 +262,7 @@ export default function PuntosFrecuentesPage() {
             />
           </div>
 
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm divide-y divide-slate-100 dark:divide-slate-800 max-h-[620px] overflow-y-auto">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm divide-y divide-slate-100 dark:divide-slate-800 max-h-[380px] sm:max-h-[480px] lg:max-h-[620px] overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center text-slate-400">
                 <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-blue-600" />
@@ -334,7 +334,7 @@ export default function PuntosFrecuentesPage() {
         </div>
 
         {/* Panel Derecho: Mapa de Google Maps */}
-        <div className="lg:col-span-7 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[620px] flex flex-col">
+        <div className="lg:col-span-7 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[340px] sm:h-[450px] lg:h-[620px] flex flex-col">
           {googleMapsApiKey && isMapLoaded ? (
             <div className="w-full h-full rounded-lg overflow-hidden relative">
               <GoogleMap
@@ -441,7 +441,7 @@ export default function PuntosFrecuentesPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="lat">Latitud</Label>
                 <Input

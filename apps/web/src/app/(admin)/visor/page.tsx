@@ -432,7 +432,7 @@ export default function VisorPage() {
             Seguimiento en vivo de unidades en ruta e historial de auditoría de kilometraje con mapas de Google.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
@@ -448,7 +448,7 @@ export default function VisorPage() {
       </div>
 
       {/* Selector de Modo: Flota Activa vs Historial */}
-      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
         <Button
           variant={activeTab === "ACTIVAS" ? "default" : "ghost"}
           size="sm"
@@ -530,7 +530,7 @@ export default function VisorPage() {
           </div>
 
           {/* Panel Derecho: Mapa en Vivo */}
-          <div className="lg:col-span-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[620px] flex flex-col">
+          <div className="lg:col-span-8 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[340px] sm:h-[450px] lg:h-[620px] flex flex-col">
             {googleMapsApiKey && isMapLoaded ? (
               <div className="w-full h-full rounded-lg overflow-hidden relative">
                 <GoogleMap
@@ -742,7 +742,7 @@ export default function VisorPage() {
                   </div>
 
                   {/* Comparativa Numérica */}
-                  <div className="grid grid-cols-3 gap-3 text-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
                     <div className="p-3 rounded-lg bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40">
                       <span className="text-[10px] text-blue-700 dark:text-blue-300 uppercase font-semibold flex items-center justify-center gap-1">
                         <Route className="h-3 w-3" />
@@ -786,7 +786,7 @@ export default function VisorPage() {
                 </div>
 
                 {/* 2. Mapa de Google Maps: Recorrido Real vs Recorrido Sugerido */}
-                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[480px] flex flex-col relative">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-sm overflow-hidden h-[340px] sm:h-[420px] lg:h-[480px] flex flex-col relative">
                   {googleMapsApiKey && isMapLoaded ? (
                     <div className="w-full h-full rounded-lg overflow-hidden relative">
                       <GoogleMap

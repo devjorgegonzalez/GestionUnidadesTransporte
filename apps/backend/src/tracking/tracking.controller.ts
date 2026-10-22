@@ -32,7 +32,7 @@ export class TrackingController {
   constructor(private readonly trackingService: TrackingService) {}
 
   @Get('viajes/hoy')
-  @Roles('CONDUCTOR', 'ADMIN')
+  @Roles('CONDUCTOR', 'ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Listar reservas del día para el conductor o administrador autenticado',
   })
@@ -41,7 +41,7 @@ export class TrackingController {
   }
 
   @Post('viajes/:viajeId/iniciar')
-  @Roles('CONDUCTOR', 'ADMIN')
+  @Roles('CONDUCTOR', 'ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Iniciar viaje (cambia viaje a EN_CURSO y UT a VIAJANDO)',
   })
@@ -50,7 +50,7 @@ export class TrackingController {
   }
 
   @Post('viajes/:viajeId/tracking/batch')
-  @Roles('CONDUCTOR', 'ADMIN')
+  @Roles('CONDUCTOR', 'ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Recepción de lotes de telemetría GPS cada 5 minutos (idempotente)',
   })
@@ -62,7 +62,7 @@ export class TrackingController {
   }
 
   @Post('viajes/:viajeId/finalizar')
-  @Roles('CONDUCTOR', 'ADMIN')
+  @Roles('CONDUCTOR', 'ADMIN', 'GESTOR')
   @ApiOperation({
     summary:
       'Terminar viaje: calcula km reales GPS con Haversine, suma al odómetro de la UT, evalúa desviación y libera UT a DISPONIBLE',
@@ -75,7 +75,7 @@ export class TrackingController {
   }
 
   @Get('visor/activos')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary:
       'Listar unidades actualmente VIAJANDO con última posición, velocidad y ruta trazada',
@@ -85,7 +85,7 @@ export class TrackingController {
   }
 
   @Get('visor/viajes')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Buscar historial de viajes activos o terminados con filtros',
   })
@@ -94,7 +94,7 @@ export class TrackingController {
   }
 
   @Get('visor/viajes/:viajeId/tracking')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Obtener detalle completo de tracking GPS y ruta de un viaje',
   })
@@ -103,7 +103,7 @@ export class TrackingController {
   }
 
   @Patch('visor/viajes/:viajeId/justificacion')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary:
       'Registrar justificación/observación administrativa por exceso de kilometraje',

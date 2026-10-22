@@ -26,7 +26,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 @ApiTags('Mantenimientos')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('ADMIN', 'GESTOR')
 @Controller('mantenimientos')
 export class MantenimientosController {
   constructor(private readonly mantenimientosService: MantenimientosService) {}

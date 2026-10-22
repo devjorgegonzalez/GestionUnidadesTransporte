@@ -61,7 +61,7 @@ export class AuthService {
       sub: admin._id.toString(),
       email: admin.email,
       nombre: admin.nombre,
-      rol: 'ADMIN',
+      rol: admin.rol as 'ADMIN' | 'GESTOR',
     };
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '8h' });
@@ -157,10 +157,10 @@ export class AuthService {
   }
 
   async getProfile(userPayload: JwtPayload) {
-    if (userPayload.rol === 'ADMIN') {
+    if (userPayload.rol === 'ADMIN' || userPayload.rol === 'GESTOR') {
       const admin = await this.adminModel.findById(userPayload.sub).select('-passwordHash');
       if (!admin || !admin.activo) {
-        throw new UnauthorizedException('Usuario administrador no encontrado o inactivo');
+        throw new UnauthorizedException('Usuario no encontrado o inactivo');
       }
       return {
         id: admin._id,

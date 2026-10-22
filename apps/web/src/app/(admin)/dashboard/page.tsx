@@ -221,17 +221,17 @@ export default function DashboardPage() {
                 {data.viajesHoy.map((v) => (
                   <div
                     key={v.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 gap-2"
                   >
-                    <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                         {v.placaUt} — {v.conductor}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 truncate">
                         {v.origen} → {v.destino}
                       </p>
                     </div>
-                    <Badge variant={v.estado === "EN_CURSO" ? "default" : "secondary"}>
+                    <Badge variant={v.estado === "EN_CURSO" ? "default" : "secondary"} className="self-start sm:self-auto shrink-0">
                       {v.estado}
                     </Badge>
                   </div>
@@ -267,17 +267,17 @@ export default function DashboardPage() {
                 {data.alertasExcesoKm.map((a) => (
                   <div
                     key={a.id}
-                    className="flex items-center justify-between p-3 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 gap-2"
                   >
-                    <div>
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300 truncate">
                         Exceso de Km: {a.placaUt} (+{a.desviacion.toFixed(1)}%)
                       </p>
                       <p className="text-xs text-amber-700/80 dark:text-amber-400/80">
                         Sugerido: {a.kmSugeridos} km | Real GPS: {a.kmReales} km
                       </p>
                     </div>
-                    <Badge variant="warning">Pendiente Justificación</Badge>
+                    <Badge variant="warning" className="self-start sm:self-auto shrink-0">Pendiente Justificación</Badge>
                   </div>
                 ))}
               </div>

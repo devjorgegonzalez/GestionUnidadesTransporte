@@ -1,5 +1,10 @@
 package com.gestionut.conductor.ui.screens.login
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,9 +26,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Dns
+import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -59,6 +66,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.gestionut.conductor.BuildConfig
 import com.gestionut.conductor.data.remote.dto.ReservaDto
+import com.gestionut.conductor.service.TrackingForegroundService
 
 @Composable
 fun LoginReservasScreen(
@@ -69,6 +77,17 @@ fun LoginReservasScreen(
     val session by viewModel.session.collectAsState()
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    var pendingReserva by remember { mutableStateOf<ReservaDto?>(null) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ ->
+        val reserva = pendingReserva
+        pendingReserva = null
+        if (reserva != null) {
+            viewModel.iniciarViaje(reserva, context, onNavigateToTrip)
+        }
+    }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -245,13 +264,73 @@ fun LoginReservasScreen(
                         )
 
                         if (!state.errorMessage.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                text = state.errorMessage!!,
-                                color = MaterialTheme.colorScheme.error,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
-                            )
+                            Spacer(modifier = Modifier.height(14.dp))
+                            val isMaintenanceOrInactive = state.errorMessage!!.contains("MANTENIMIENTO", ignoreCase = true) ||
+                                    state.errorMessage!!.contains("INACTIVA", ignoreCase = true)
+
+                            val containerBg = if (isMaintenanceOrInactive) {
+                                Color(0xFF332005)
+                            } else {
+                                MaterialTheme.colorScheme.errorContainer
+                            }
+                            val contentColor = if (isMaintenanceOrInactive) {
+                                Color(0xFFFDE68A)
+                            } else {
+                                MaterialTheme.colorScheme.onErrorContainer
+                            }
+                            val borderColor = if (isMaintenanceOrInactive) {
+                                Color(0xFFD97706)
+                            } else {
+                                MaterialTheme.colorScheme.error
+                            }
+
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = CardDefaults.cardColors(containerColor = containerBg),
+                                border = BorderStroke(1.dp, borderColor)
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(14.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Icon(
+                                        imageVector = if (isMaintenanceOrInactive) Icons.Default.Warning else Icons.Default.ErrorOutline,
+                                        contentDescription = null,
+                                        tint = if (isMaintenanceOrInactive) Color(0xFFF59E0B) else MaterialTheme.colorScheme.error,
+                                        modifier = Modifier
+                                            .size(24.dp)
+                                            .padding(top = 2.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column {
+                                        Text(
+                                            text = if (isMaintenanceOrInactive) "Unidad No Disponible" else "Aviso de Operación",
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = contentColor
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = state.errorMessage!!,
+                                            fontSize = 13.sp,
+                                            lineHeight = 17.sp,
+                                            color = contentColor.copy(alpha = 0.95f)
+                                        )
+                                        if (isMaintenanceOrInactive) {
+                                            Spacer(modifier = Modifier.height(6.dp))
+                                            Text(
+                                                text = "Por favor comuníquese con el supervisor de flota para la reasignación de su viaje a una unidad operativa.",
+                                                fontSize = 11.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = Color(0xFFFBBF24)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
 
                         Spacer(modifier = Modifier.height(18.dp))
@@ -276,15 +355,6 @@ fun LoginReservasScreen(
                                 Text("Buscar Reservas de Hoy", fontWeight = FontWeight.Bold)
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(12.dp))
-                        val currentServerUrl = session.customBaseUrl ?: BuildConfig.BASE_URL
-                        Text(
-                            text = "Servidor: $currentServerUrl",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
                     }
                 }
             }
@@ -328,7 +398,19 @@ fun LoginReservasScreen(
                         ReservaItemCard(
                             reserva = reserva,
                             onIniciarViaje = {
-                                viewModel.iniciarViaje(reserva, context, onNavigateToTrip)
+                                if (TrackingForegroundService.hasLocationPermission(context)) {
+                                    viewModel.iniciarViaje(reserva, context, onNavigateToTrip)
+                                } else {
+                                    pendingReserva = reserva
+                                    val perms = mutableListOf(
+                                        Manifest.permission.ACCESS_FINE_LOCATION,
+                                        Manifest.permission.ACCESS_COARSE_LOCATION
+                                    )
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                        perms.add(Manifest.permission.POST_NOTIFICATIONS)
+                                    }
+                                    permissionLauncher.launch(perms.toTypedArray())
+                                }
                             }
                         )
                     }

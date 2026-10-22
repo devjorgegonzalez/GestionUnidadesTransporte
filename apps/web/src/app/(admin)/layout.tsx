@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
@@ -14,6 +14,7 @@ export default function AdminLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -26,7 +27,7 @@ export default function AdminLayout({
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-          <p className="text-sm text-slate-500 font-medium">
+          <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">
             Verificando sesión...
           </p>
         </div>
@@ -39,11 +40,16 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-50/50 dark:bg-slate-950">
-      <Sidebar />
+    <div className="min-h-screen flex bg-slate-50/60 dark:bg-slate-950 transition-colors">
+      <Sidebar
+        mobileOpen={mobileMenuOpen}
+        onMobileClose={() => setMobileMenuOpen(false)}
+      />
       <div className="flex-1 flex flex-col min-w-0">
-        <Navbar />
-        <main className="flex-1 p-6 md:p-8 overflow-x-hidden">{children}</main>
+        <Navbar onMenuToggle={() => setMobileMenuOpen((prev) => !prev)} />
+        <main className="flex-1 p-3.5 sm:p-5 md:p-6 lg:p-8 overflow-x-hidden">
+          {children}
+        </main>
       </div>
     </div>
   );

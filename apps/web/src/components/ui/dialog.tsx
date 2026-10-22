@@ -31,16 +31,16 @@ export function Dialog({ open, onOpenChange, children, className }: DialogProps)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={() => onOpenChange(false)}
       />
-      <div className={cn("relative z-50 w-full max-w-lg rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xl my-8 max-h-[90vh] flex flex-col", className)}>
+      <div className={cn("relative z-50 w-full max-w-lg rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-2xl my-4 sm:my-8 max-h-[94vh] flex flex-col", className)}>
         {children}
         <button
           onClick={() => onOpenChange(false)}
-          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity focus:outline-none text-slate-500 hover:text-slate-800 dark:hover:text-white"
+          className="absolute right-3 top-3 sm:right-4 sm:top-4 p-1 rounded-md opacity-70 hover:opacity-100 transition-opacity focus:outline-none text-slate-500 hover:text-slate-800 dark:hover:text-white"
         >
           <X className="h-5 w-5" />
           <span className="sr-only">Cerrar</span>

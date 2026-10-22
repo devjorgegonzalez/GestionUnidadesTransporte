@@ -93,6 +93,8 @@ class LoginReservasViewModel @Inject constructor(
             if (loginResult.isFailure) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
+                    busquedaRealizada = false,
+                    reservas = emptyList(),
                     errorMessage = loginResult.exceptionOrNull()?.message ?: "Error al autenticar conductor"
                 )
                 return@launch

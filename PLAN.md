@@ -38,9 +38,11 @@ flowchart TD
    - Crear `docker-compose.yml` en la raíz con contenedores `mongodb`, `backend` y `web`.
 2. [x] **Autenticación Dual y Seed (`spec/01`):**
    - Implementar esquema `UsuarioAdmin` y servicio de `SeedService` (creación idempotente de Admin por defecto + catálogo base del checklist de mantenimiento).
-   - Implementar `JwtStrategy`, `JwtAuthGuard` y `RolesGuard` (`ADMIN` y `CONDUCTOR`).
+   - Implementar `JwtStrategy`, `JwtAuthGuard` y `RolesGuard` (`ADMIN`, `GESTOR` y `CONDUCTOR`).
    - Crear endpoints `POST /api/v1/auth/admin/login`, `POST /api/v1/auth/conductor/login` y `GET /api/v1/auth/me`.
-   - Implementar en `apps/web` la pantalla `/login`, almacenamiento de sesión JWT, layout administrativo con navegación lateral y protección de rutas.
+   - Implementar módulo CRUD de Administración de Usuarios (`/api/v1/usuarios`) restringido exclusivamente a rol `ADMIN`.
+   - Habilitar rol `GESTOR` con acceso a todos los módulos operativos de flota (UTs, Conductores, Puntos, Reservas, Mantenimiento, Visor, Dashboard) y restricción del módulo de usuarios.
+   - Implementar en `apps/web` la pantalla `/login`, almacenamiento de sesión JWT, layout administrativo con navegación lateral filtrada por rol y módulo `/usuarios`.
 
 ### Entregable y Verificación de Fase 1:
 - [x] Contenedores Docker corriendo en los puertos `10101` (web), `10102` (backend REST API + Swagger) y `10103` (MongoDB).

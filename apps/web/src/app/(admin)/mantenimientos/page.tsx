@@ -382,7 +382,7 @@ export default function MantenimientosPage() {
             Control de órdenes de trabajo, checklists de tareas preventivas y retorno a servicio operativo.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
@@ -402,7 +402,7 @@ export default function MantenimientosPage() {
       </div>
 
       {/* Tabs de Filtro: En Curso vs Finalizados */}
-      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto">
         <Button
           variant={tabEstado === "BORRADOR" ? "default" : "ghost"}
           size="sm"
@@ -528,6 +528,10 @@ export default function MantenimientosPage() {
                 </p>
                 <p className="text-slate-500">
                   Kilometraje actual registrado: <strong>{selectedUt.kilometraje} km</strong>
+                </p>
+                <p className="text-amber-700 dark:text-amber-400 font-medium pt-1.5 border-t border-slate-200 dark:border-slate-700/60 flex items-center gap-1.5">
+                  <AlertCircle className="h-3.5 w-3.5 flex-shrink-0 text-amber-600" />
+                  <span>Aviso: Al ingresar a mantenimiento, las reservas en estado PROGRAMADA para esta UT se cancelarán automáticamente para impedir que los conductores intenten operarlas.</span>
                 </p>
               </div>
             )}

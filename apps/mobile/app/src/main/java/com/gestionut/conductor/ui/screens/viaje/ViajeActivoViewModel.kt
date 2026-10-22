@@ -62,7 +62,9 @@ class ViajeActivoViewModel @Inject constructor(
     private val origenLng: Double = savedStateHandle.get<Float>("origenLng")?.toDouble() ?: -66.8617
     private val destinoLat: Double = savedStateHandle.get<Float>("destinoLat")?.toDouble() ?: 10.5050
     private val destinoLng: Double = savedStateHandle.get<Float>("destinoLng")?.toDouble() ?: -66.9146
-    private val kmSugerido: Double = savedStateHandle.get<Float>("kmSugerido")?.toDouble() ?: 0.0
+    private val kmSugerido: Double = savedStateHandle.get<Float>("kmSugerido")?.let {
+        Math.round(it.toDouble() * 100.0) / 100.0
+    } ?: 0.0
 
     private val _uiState = MutableStateFlow(
         ViajeActivoUiState(

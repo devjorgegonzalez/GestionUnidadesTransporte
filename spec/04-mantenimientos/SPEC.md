@@ -57,9 +57,8 @@ Colección: `mantenimientos`
    - El usuario selecciona las tareas del checklist base a realizar y puede agregar múltiples tareas adicionales de forma manual.
    - Al guardar la apertura, el registro de mantenimiento queda en estado `BORRADOR` y el estado de la UT cambia atómicamente a `EN_MANTENIMIENTO`.
 3. **Gestión de Reservas Pendientes Afectadas:**
-   - Antes o durante la apertura del mantenimiento (y también si al cerrar el mantenimiento la UT queda `INACTIVA`), si la UT tiene reservas futuras en estado `PROGRAMADA`, el sistema alerta al usuario listando dichas reservas y permitiéndole en el mismo flujo:
-     - **Reasignar** esas reservas a otra UT disponible, o
-     - **Cancelar** las reservas afectadas.
+   - Al momento de la apertura del mantenimiento (y también si al cerrar el mantenimiento la UT queda `INACTIVA`), el sistema busca automáticamente todas las reservas de la unidad en estado `PROGRAMADA`.
+   - Dichas reservas son **canceladas automáticamente** (`CANCELADA`) registrando la justificación correspondiente, garantizando que no queden reservas activas en una unidad que no puede operar y evitando intentos de despacho desde la app móvil. El sistema informa al administrador la cantidad de reservas canceladas.
 4. **Edición de Borrador:**
    - Mientras el mantenimiento está en estado `BORRADOR`, el usuario puede actualizar las tareas seleccionadas del checklist o agregar/quitar tareas manuales.
 5. **Finalización del Mantenimiento:**

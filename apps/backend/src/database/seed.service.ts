@@ -97,6 +97,24 @@ export class SeedService implements OnApplicationBootstrap {
     } else {
       this.logger.log(`[Seed] Usuario administrador verificado (${defaultEmail}).`);
     }
+
+    // Seed de Gestor de Flota de prueba
+    const gestorEmail = 'gestor@empresa.com';
+    const existingGestor = await this.adminModel.findOne({ email: gestorEmail });
+    if (!existingGestor) {
+      const salt = await bcrypt.genSalt(10);
+      const passwordHash = await bcrypt.hash('Gestor123*', salt);
+      await this.adminModel.create({
+        nombre: 'Gestor de Flota',
+        email: gestorEmail,
+        passwordHash,
+        rol: 'GESTOR',
+        activo: true,
+      });
+      this.logger.log(`[Seed] Usuario gestor creado por defecto: ${gestorEmail}`);
+    } else {
+      this.logger.log(`[Seed] Usuario gestor verificado (${gestorEmail}).`);
+    }
   }
 
   private async seedCatalogoTareas() {

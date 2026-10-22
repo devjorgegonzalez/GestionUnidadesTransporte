@@ -86,8 +86,8 @@ GestionUnidadesTransporte/
 2. **Bloqueo de Cambio Manual de Estado de UT:** El estado de una UT **no puede cambiarse manualmente** desde el CRUD de Unidades de Transporte si su estado actual es `VIAJANDO` (tiene un viaje activo) o `EN_MANTENIMIENTO` (tiene una orden de mantenimiento en borrador/activa).
 3. **Ciclo de Vida de Mantenimiento:**
    - Al crear un registro de mantenimiento sobre una UT, el formulario queda en estado `BORRADOR` (en curso) y cambia automáticamente la UT a `EN_MANTENIMIENTO`.
-   - Si la UT tenía reservas pendientes (`PROGRAMADA`), el sistema alerta al administrador mostrándolas y permitiéndole reasignar otra UT o cancelar dichas reservas.
-   - Al finalizar el mantenimiento y registrar las observaciones del personal técnico, el administrador debe elegir explícitamente si la UT pasa a estado `DISPONIBLE` o `INACTIVA`.
+   - Si la UT tenía reservas pendientes (`PROGRAMADA`), el sistema las cancela automáticamente (`CANCELADA`) y alerta al administrador con la cantidad de reservas canceladas, evitando discrepancias operativas en la app móvil del conductor.
+   - Al finalizar el mantenimiento y registrar las observaciones del personal técnico, el administrador debe elegir explícitamente si la UT pasa a estado `DISPONIBLE` o `INACTIVA`. Si pasa a `INACTIVA`, cualquier reserva pendiente también se cancela automáticamente.
 4. **Reglas de Reserva de Viajes:**
    - Solo se pueden asignar UTs cuyo estado actual sea `DISPONIBLE` o `VIAJANDO` (nunca `EN_MANTENIMIENTO` ni `INACTIVA`).
    - Se solicita Fecha y Hora de inicio, Conductor, UT, Punto de Origen y Punto de Destino (seleccionables desde Puntos Frecuentes o directamente en el mapa de Google Maps).

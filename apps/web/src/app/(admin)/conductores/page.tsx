@@ -286,7 +286,7 @@ export default function ConductoresPage() {
             Personal operativo habilitado para asignación y realización de viajes.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
@@ -418,7 +418,7 @@ export default function ConductoresPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="nombre">Nombre</Label>
                 <Input

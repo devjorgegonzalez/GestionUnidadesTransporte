@@ -330,7 +330,7 @@ export default function UnidadesTransportePage() {
             Catálogo y control de estado de la flota de vehículos industriales.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button
             variant="outline"
             size="sm"
@@ -474,7 +474,7 @@ export default function UnidadesTransportePage() {
               </Alert>
             )}
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="placa">Placa (7 caracteres)</Label>
                 <Input
@@ -515,7 +515,7 @@ export default function UnidadesTransportePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="marca">Marca</Label>
                 <Input
@@ -543,7 +543,7 @@ export default function UnidadesTransportePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
                 <Label htmlFor="anio">Año</Label>
                 <Input

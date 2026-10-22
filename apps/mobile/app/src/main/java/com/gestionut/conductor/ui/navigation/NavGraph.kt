@@ -31,9 +31,16 @@ sealed class Screen(val route: String) {
             destinoLng: Double,
             kmSugerido: Double
         ): String {
-            val safeOrigen = URLEncoder.encode(origenNombre, StandardCharsets.UTF_8.toString())
-            val safeDestino = URLEncoder.encode(destinoNombre, StandardCharsets.UTF_8.toString())
-            return "viaje_activo/$viajeId/$placa/$safeOrigen/$safeDestino/${origenLat.toFloat()}/${origenLng.toFloat()}/${destinoLat.toFloat()}/${destinoLng.toFloat()}/${kmSugerido.toFloat()}"
+            val safeOrigen = URLEncoder.encode(
+                origenNombre.replace("/", "-").ifBlank { "Origen" },
+                StandardCharsets.UTF_8.toString()
+            )
+            val safeDestino = URLEncoder.encode(
+                destinoNombre.replace("/", "-").ifBlank { "Destino" },
+                StandardCharsets.UTF_8.toString()
+            )
+            val safePlaca = placa.replace("/", "-").ifBlank { "UT" }
+            return "viaje_activo/$viajeId/$safePlaca/$safeOrigen/$safeDestino/${origenLat.toFloat()}/${origenLng.toFloat()}/${destinoLat.toFloat()}/${destinoLng.toFloat()}/${kmSugerido.toFloat()}"
         }
     }
 }

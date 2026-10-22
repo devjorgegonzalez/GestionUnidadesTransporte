@@ -1,11 +1,13 @@
 package com.gestionut.conductor.service
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
 import android.location.Location
 import android.net.ConnectivityManager
@@ -17,6 +19,7 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.gestionut.conductor.GestionUTApp
 import com.gestionut.conductor.R
 import com.gestionut.conductor.data.local.entity.PuntoTrackingLocalEntity
@@ -80,24 +83,54 @@ class TrackingForegroundService : Service() {
         private val _trackingState = MutableStateFlow(TrackingServiceState())
         val trackingState = _trackingState.asStateFlow()
 
+        fun hasLocationPermission(context: Context): Boolean {
+            val fine = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            val coarse = ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+            return fine || coarse
+        }
+
         fun startTracking(context: Context, viajeId: String, placa: String) {
+            if (!hasLocationPermission(context)) {
+                Log.w(TAG, "No se puede iniciar TrackingForegroundService: sin permisos de ubicación")
+                _trackingState.value = _trackingState.value.copy(
+                    isTracking = false,
+                    viajeId = viajeId,
+                    placa = placa,
+                    lastSyncMessage = "Permiso de ubicación pendiente"
+                )
+                return
+            }
             val intent = Intent(context, TrackingForegroundService::class.java).apply {
                 action = ACTION_START
                 putExtra(EXTRA_VIAJE_ID, viajeId)
                 putExtra(EXTRA_PLACA, placa)
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    context.startForegroundService(intent)
+                } else {
+                    context.startService(intent)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al iniciar TrackingForegroundService", e)
             }
         }
 
         fun stopTracking(context: Context) {
-            val intent = Intent(context, TrackingForegroundService::class.java).apply {
-                action = ACTION_STOP
+            try {
+                val intent = Intent(context, TrackingForegroundService::class.java).apply {
+                    action = ACTION_STOP
+                }
+                context.startService(intent)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al detener TrackingForegroundService", e)
             }
-            context.startService(intent)
         }
     }
 
@@ -128,15 +161,39 @@ class TrackingForegroundService : Service() {
         activeViajeId = viajeId
         activePlaca = placa
 
-        val notification = buildNotification("Viaje en curso - Registrando recorrido de UT $placa")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+        if (!hasLocationPermission(this)) {
+            Log.w(TAG, "Cancelando startForeground: permisos de ubicación no concedidos")
+            _trackingState.value = _trackingState.value.copy(
+                isTracking = false,
+                viajeId = viajeId,
+                placa = placa,
+                lastSyncMessage = "Permiso de ubicación requerido"
             )
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
+            stopSelf()
+            return
+        }
+
+        val notification = buildNotification("Viaje en curso - Registrando recorrido de UT $placa")
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "No se pudo elevar el servicio a foreground con tipo LOCATION", e)
+            _trackingState.value = _trackingState.value.copy(
+                isTracking = false,
+                viajeId = viajeId,
+                placa = placa,
+                lastSyncMessage = "Active el permiso de ubicación para el GPS"
+            )
+            stopSelf()
+            return
         }
 
         _trackingState.value = _trackingState.value.copy(
@@ -206,6 +263,7 @@ class TrackingForegroundService : Service() {
     private fun startPeriodicSync(viajeId: String) {
         periodicSyncJob?.cancel()
         periodicSyncJob = serviceScope.launch {
+            syncBatch(viajeId)
             while (isActive) {
                 delay(300_000L) // 5 minutes = 300,000 ms
                 syncBatch(viajeId)

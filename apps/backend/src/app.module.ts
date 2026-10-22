@@ -9,6 +9,7 @@ import { MantenimientosModule } from './mantenimientos/mantenimientos.module.js'
 import { ReservasViajesModule } from './reservas-viajes/reservas-viajes.module.js';
 import { TrackingModule } from './tracking/tracking.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
+import { UsuariosModule } from './usuarios/usuarios.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { DashboardModule } from './dashboard/dashboard.module.js';
     ReservasViajesModule,
     TrackingModule,
     DashboardModule,
+    UsuariosModule,
   ],
   controllers: [],
   providers: [],

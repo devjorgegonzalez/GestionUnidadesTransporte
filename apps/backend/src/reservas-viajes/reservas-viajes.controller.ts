@@ -30,7 +30,7 @@ export class ReservasViajesController {
   constructor(private readonly reservasService: ReservasViajesService) {}
 
   @Post()
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary:
       'Programar una nueva Reserva de Viaje (valida UT DISPONIBLE o VIAJANDO)',
@@ -45,14 +45,14 @@ export class ReservasViajesController {
   }
 
   @Get()
-  @Roles('ADMIN', 'CONDUCTOR')
+  @Roles('ADMIN', 'GESTOR', 'CONDUCTOR')
   @ApiOperation({ summary: 'Listar reservas de viajes paginadas con filtros' })
   async findAll(@Query() query: QueryReservasViajesDto) {
     return this.reservasService.findAll(query);
   }
 
   @Get(':id')
-  @Roles('ADMIN', 'CONDUCTOR')
+  @Roles('ADMIN', 'GESTOR', 'CONDUCTOR')
   @ApiOperation({ summary: 'Obtener detalle de una reserva de viaje' })
   @ApiResponse({ status: 200, description: 'Detalle de la reserva.' })
   @ApiResponse({ status: 404, description: 'Reserva no encontrada.' })
@@ -61,7 +61,7 @@ export class ReservasViajesController {
   }
 
   @Patch(':id')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({
     summary: 'Modificar una reserva programada (reasignar UT/conductor o ruta)',
   })
@@ -73,7 +73,7 @@ export class ReservasViajesController {
   }
 
   @Patch(':id/cancelar')
-  @Roles('ADMIN')
+  @Roles('ADMIN', 'GESTOR')
   @ApiOperation({ summary: 'Cancelar una reserva programada' })
   @ApiResponse({ status: 200, description: 'Reserva cancelada exitosamente.' })
   async cancelar(@Param('id') id: string) {

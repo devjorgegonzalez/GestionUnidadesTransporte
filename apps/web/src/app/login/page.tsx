@@ -18,6 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const loginSchema = z.object({
   email: z
@@ -65,7 +66,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 relative transition-colors">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+        <ThemeToggle />
+      </div>
+
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-500/30">
@@ -154,12 +159,20 @@ export default function LoginPage() {
           </form>
         </Card>
 
-        <p className="text-center text-xs text-slate-400">
-          Credencial por defecto de prueba:{" "}
-          <span className="font-mono text-slate-600 dark:text-slate-300">
-            admin@empresa.com / Admin123*
-          </span>
-        </p>
+        <div className="text-center text-xs text-slate-400 space-y-1">
+          <p>
+            Admin:{" "}
+            <span className="font-mono text-slate-600 dark:text-slate-300">
+              admin@empresa.com / Admin123*
+            </span>
+          </p>
+          <p>
+            Gestor:{" "}
+            <span className="font-mono text-slate-600 dark:text-slate-300">
+              gestor@empresa.com / Gestor123*
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );

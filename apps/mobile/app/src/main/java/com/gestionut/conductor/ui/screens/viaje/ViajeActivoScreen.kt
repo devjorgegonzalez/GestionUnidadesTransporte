@@ -1,5 +1,9 @@
 package com.gestionut.conductor.ui.screens.viaje
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +47,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.gestionut.conductor.service.TrackingForegroundService
 import com.gestionut.conductor.ui.components.SpeedometerGauge
 import com.gestionut.conductor.ui.components.SyncStatusBadge
 import com.gestionut.conductor.ui.components.TripMapView
@@ -56,6 +62,31 @@ fun ViajeActivoScreen(
     val pendingPointsCount by viewModel.noSincronizadosCount.collectAsState()
     val puntosRuta by viewModel.puntosRuta.collectAsState()
     val context = LocalContext.current
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ ->
+        if (TrackingForegroundService.hasLocationPermission(context) && state.viajeId.isNotBlank()) {
+            TrackingForegroundService.startTracking(context, state.viajeId, state.placa)
+        }
+    }
+
+    LaunchedEffect(state.viajeId) {
+        if (state.viajeId.isNotBlank() && !trackingState.isTracking) {
+            if (TrackingForegroundService.hasLocationPermission(context)) {
+                TrackingForegroundService.startTracking(context, state.viajeId, state.placa)
+            } else {
+                val perms = mutableListOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    perms.add(Manifest.permission.POST_NOTIFICATIONS)
+                }
+                locationPermissionLauncher.launch(perms.toTypedArray())
+            }
+        }
+    }
 
     var showConfirmDialog by remember { mutableStateOf(false) }
 

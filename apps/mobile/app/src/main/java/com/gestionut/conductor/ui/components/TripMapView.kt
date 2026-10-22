@@ -24,6 +24,7 @@ import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.TileOverlay
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.delay
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -49,7 +50,7 @@ fun TripMapView(
     )
 
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialPos, 15f)
+        position = CameraPosition.fromLatLngZoom(initialPos, 14.5f)
     }
 
     var hasCenteredOnFirstFix by remember { mutableStateOf(false) }
@@ -59,6 +60,10 @@ fun TripMapView(
     val vehicleMarkerState = rememberMarkerState(
         position = LatLng(effectiveLat ?: origenLat, effectiveLng ?: origenLng)
     )
+
+    val tileLoadedSignal = remember {
+        kotlinx.coroutines.channels.Channel<Unit>(kotlinx.coroutines.channels.Channel.CONFLATED)
+    }
 
     val googleRasterTileProvider = remember {
         TileProvider { x, y, zoom ->
@@ -70,9 +75,19 @@ fun TripMapView(
                     setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 14)")
                 }
                 val bytes = conn.inputStream.use { it.readBytes() }
+                tileLoadedSignal.trySend(Unit)
                 Tile(256, 256, bytes)
             } catch (e: Exception) {
                 TileProvider.NO_TILE
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        for (signal in tileLoadedSignal) {
+            delay(350)
+            if (!cameraPositionState.isMoving) {
+                cameraPositionState.animate(CameraUpdateFactory.scrollBy(1f, 1f), 120)
             }
         }
     }
@@ -86,14 +101,24 @@ fun TripMapView(
     }
 
     LaunchedEffect(effectiveLat, effectiveLng) {
+        val targetLat = effectiveLat ?: origenLat
+        val targetLng = effectiveLng ?: origenLng
+        val newPos = LatLng(targetLat, targetLng)
         if (effectiveLat != null && effectiveLng != null) {
-            val newPos = LatLng(effectiveLat, effectiveLng)
             vehicleMarkerState.position = newPos
-            if (!hasCenteredOnFirstFix) {
-                cameraPositionState.animate(
-                    CameraUpdateFactory.newLatLngZoom(newPos, 15f),
-                    1000
-                )
+        }
+        if (!hasCenteredOnFirstFix) {
+            delay(1000)
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(newPos, 15f),
+                600
+            )
+            delay(800)
+            cameraPositionState.animate(
+                CameraUpdateFactory.scrollBy(2f, 2f),
+                200
+            )
+            if (effectiveLat != null && effectiveLng != null) {
                 hasCenteredOnFirstFix = true
             }
         }

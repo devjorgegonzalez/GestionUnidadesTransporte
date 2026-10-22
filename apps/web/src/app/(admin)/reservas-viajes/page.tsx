@@ -589,7 +589,7 @@ export default function ReservasViajesPage() {
             Programación de viajes con trazado interactivo en Google Maps y cálculo de distancia en carretera.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
           <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Actualizar
@@ -602,8 +602,8 @@ export default function ReservasViajesPage() {
       </div>
 
       {/* Filtros */}
-      <div className="flex items-center gap-3">
-        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+        <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 shrink-0">
           Filtrar por Estado:
         </span>
         <div className="flex gap-1.5 flex-wrap">
@@ -702,16 +702,19 @@ export default function ReservasViajesPage() {
               {/* Columna Izquierda: Datos del Viaje y Puntos */}
               <div className="lg:col-span-6 space-y-4">
                 {/* UT y Conductor */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="utId">Unidad de Transporte</Label>
                     <Select id="utId" {...register("utId")} disabled={submitting}>
                       <option value="">-- Seleccionar UT --</option>
-                      {uts.map((u) => (
-                        <option key={u._id} value={u._id}>
-                          {u.placa} ({u.marca} {u.modelo}) [{u.estado}]
-                        </option>
-                      ))}
+                      {uts.map((u) => {
+                        const noDisponible = u.estado === "EN_MANTENIMIENTO" || u.estado === "INACTIVA";
+                        return (
+                          <option key={u._id} value={u._id} disabled={noDisponible}>
+                            {u.placa} ({u.marca} {u.modelo}) [{u.estado}]{noDisponible ? " - No disponible" : ""}
+                          </option>
+                        );
+                      })}
                     </Select>
                     {errors.utId && (
                       <p className="text-xs text-red-500">{errors.utId.message}</p>
@@ -954,7 +957,7 @@ export default function ReservasViajesPage() {
                 </div>
 
                 {/* Contenedor del Mapa */}
-                <div className="relative w-full h-[410px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner bg-slate-100 dark:bg-slate-900">
+                <div className="relative w-full h-[280px] sm:h-[350px] lg:h-[410px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner bg-slate-100 dark:bg-slate-900">
                   {isMapLoaded && googleMapsApiKey ? (
                     <GoogleMap
                       mapContainerStyle={{ width: "100%", height: "100%" }}

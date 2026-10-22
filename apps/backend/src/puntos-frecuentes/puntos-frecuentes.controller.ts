@@ -26,7 +26,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 @ApiTags('Puntos Frecuentes')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('ADMIN', 'GESTOR')
 @Controller('puntos-frecuentes')
 export class PuntosFrecuentesController {
   constructor(

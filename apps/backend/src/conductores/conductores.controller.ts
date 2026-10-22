@@ -25,7 +25,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 @ApiTags('Conductores')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('ADMIN', 'GESTOR')
 @Controller('conductores')
 export class ConductoresController {
   constructor(private readonly conductoresService: ConductoresService) {}

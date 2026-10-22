@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 
 export interface JwtPayload {
   sub: string;
-  rol: 'ADMIN' | 'CONDUCTOR';
+  rol: 'ADMIN' | 'GESTOR' | 'CONDUCTOR';
   email?: string;
   nombre?: string;
   cedula?: string;

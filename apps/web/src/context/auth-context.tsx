@@ -13,7 +13,7 @@ export interface UserProfile {
   id: string;
   email: string;
   nombre: string;
-  rol: "ADMIN" | "CONDUCTOR";
+  rol: "ADMIN" | "GESTOR" | "CONDUCTOR";
 }
 
 interface AuthContextType {

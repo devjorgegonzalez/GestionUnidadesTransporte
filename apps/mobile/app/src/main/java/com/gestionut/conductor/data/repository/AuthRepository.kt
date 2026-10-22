@@ -5,6 +5,7 @@ import com.gestionut.conductor.data.preferences.ConductorSession
 import com.gestionut.conductor.data.remote.api.AuthApi
 import com.gestionut.conductor.data.remote.dto.LoginConductorRequest
 import com.gestionut.conductor.data.remote.dto.LoginConductorResponse
+import com.gestionut.conductor.util.ApiErrorParser
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +38,11 @@ class AuthRepository @Inject constructor(
                 )
                 Result.success(body)
             } else {
-                val errorMsg = response.errorBody()?.string() ?: "Error de autenticación (${response.code()})"
+                val rawError = response.errorBody()?.string()
+                val errorMsg = ApiErrorParser.parseErrorMessage(
+                    rawError,
+                    "Error de autenticación (${response.code()})"
+                )
                 Result.failure(Exception(errorMsg))
             }
         } catch (e: Exception) {

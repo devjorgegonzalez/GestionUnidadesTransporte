@@ -25,7 +25,7 @@ import { Roles } from '../common/decorators/roles.decorator.js';
 @ApiTags('Unidades de Transporte')
 @ApiBearerAuth('JWT-auth')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
+@Roles('ADMIN', 'GESTOR')
 @Controller('unidades-transporte')
 export class UnidadesTransporteController {
   constructor(private readonly utService: UnidadesTransporteService) {}

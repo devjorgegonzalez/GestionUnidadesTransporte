@@ -66,12 +66,24 @@ export class MantenimientosService {
       );
     }
 
-    // Buscar reservas pendientes que podrían verse afectadas
+    // Cancelar automáticamente todas las reservas pendientes (PROGRAMADA) de esta UT
     const reservasAfectadas = await this.reservaModel.find({
       utId: ut._id,
       estado: EstadoReservaViaje.PROGRAMADA,
-      fechaHoraInicioProgramada: { $gte: new Date() },
     });
+
+    if (reservasAfectadas.length > 0) {
+      await this.reservaModel.updateMany(
+        { utId: ut._id, estado: EstadoReservaViaje.PROGRAMADA },
+        {
+          $set: {
+            estado: EstadoReservaViaje.CANCELADA,
+            justificacionExcesoKm:
+              'Cancelada automáticamente por ingreso de la unidad a mantenimiento',
+          },
+        },
+      );
+    }
 
     // Cambiar estado de la UT a EN_MANTENIMIENTO
     ut.estado = EstadoUnidadTransporte.EN_MANTENIMIENTO;
@@ -94,12 +106,14 @@ export class MantenimientosService {
       fechaApertura: new Date(),
     });
 
+    const totalCanceladas = reservasAfectadas.length;
     return {
       mantenimiento,
       reservasAfectadas,
+      reservasCanceladas: totalCanceladas,
       alertaReservas:
-        reservasAfectadas.length > 0
-          ? `Atención: Esta unidad tiene ${reservasAfectadas.length} reserva(s) programada(s) pendiente(s). Se recomienda reasignarlas o cancelarlas.`
+        totalCanceladas > 0
+          ? `Atención: Se cancelaron automáticamente ${totalCanceladas} reserva(s) programada(s) que estaban asignadas a la unidad ${ut.placa}.`
           : null,
     };
   }
@@ -156,14 +170,26 @@ export class MantenimientosService {
     ut.estado = dto.estadoFinalUt;
     await ut.save();
 
-    // Si la UT queda INACTIVA, alertar reservas pendientes
+    // Si la UT queda INACTIVA, cancelar reservas pendientes
     let reservasAfectadas: ReservaViajeDocument[] = [];
     if (dto.estadoFinalUt === EstadoUnidadTransporte.INACTIVA) {
       reservasAfectadas = await this.reservaModel.find({
         utId: ut._id,
         estado: EstadoReservaViaje.PROGRAMADA,
-        fechaHoraInicioProgramada: { $gte: new Date() },
       });
+
+      if (reservasAfectadas.length > 0) {
+        await this.reservaModel.updateMany(
+          { utId: ut._id, estado: EstadoReservaViaje.PROGRAMADA },
+          {
+            $set: {
+              estado: EstadoReservaViaje.CANCELADA,
+              justificacionExcesoKm:
+                'Cancelada automáticamente por pase de la unidad a estado INACTIVA',
+            },
+          },
+        );
+      }
     }
 
     return {
@@ -174,9 +200,10 @@ export class MantenimientosService {
         estado: ut.estado,
       },
       reservasAfectadas,
+      reservasCanceladas: reservasAfectadas.length,
       alerta:
         reservasAfectadas.length > 0
-          ? `La unidad quedó INACTIVA y tiene ${reservasAfectadas.length} reserva(s) programada(s) que requieren reasignación o cancelación.`
+          ? `La unidad quedó INACTIVA. Se cancelaron automáticamente ${reservasAfectadas.length} reserva(s) programada(s) que estaban pendientes.`
           : null,
     };
   }

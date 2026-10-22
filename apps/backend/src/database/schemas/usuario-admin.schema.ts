@@ -14,8 +14,8 @@ export class UsuarioAdmin {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ required: true, default: 'ADMIN' })
-  rol: string;
+  @Prop({ required: true, enum: ['ADMIN', 'GESTOR'], default: 'ADMIN' })
+  rol: 'ADMIN' | 'GESTOR';
 
   @Prop({ required: true, default: true })
   activo: boolean;
